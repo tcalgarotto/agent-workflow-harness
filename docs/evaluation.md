@@ -109,6 +109,11 @@ to the existing project policy.
 | Worker requests another task's thread or store namespace | Reject unauthorized reads, writes, enumeration and resume |
 | Nested tool payload includes synthetic sensitive data | Omit/redact it before any enabled external trace export |
 | Telemetry exporter is unavailable | Preserve mandatory local evidence and apply the explicit audit policy |
+| Revoked or superseded evidence remains in a search index | Exclude it from authorized context before model exposure |
+| A selective ANN query returns fewer than k results | Preserve filters and report insufficient results or use an authorized fallback |
+| An old embedding job finishes after a source update | Reject publication into the current accepted generation |
+| Two callers reuse a public scenario label as thread identity | Keep authenticated task/run contexts separate |
+| A generated operator form submits an unauthorized action | Reject it through server-side authorization and revision checks |
 
 These are future acceptance cases, not executed test results. Today's schema
 validator cannot establish those runtime properties.
@@ -122,6 +127,11 @@ External architecture benchmarks are workload-specific. The reviewed retail
 benchmark evaluated distractor context with little coordination, not concurrent
 code changes. Our fixtures must cover repository conflicts, task handoffs,
 integration and recovery. See the [LangChain source review](research/2026-10-20-langchain-ecosystem.md).
+
+Compare retrieval candidates on the same authorized source/query fixtures, including
+code identifiers, language differences, selective scopes, revocations, index lag
+and restore. Track retrieval ranking/recall, supported answers, abstention and
+coordination latency under ingestion load. See [storage evaluation](storage-and-retrieval.md#evidence-required-before-promotion).
 
 ## Measure configurations under hard constraints
 

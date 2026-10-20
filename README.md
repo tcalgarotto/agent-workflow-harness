@@ -80,6 +80,11 @@ LangGraph engine experiment, selected LangChain components, optional Deep Agents
 workers, and replaceable observability. Its [source review](docs/research/2026-10-20-langchain-ecosystem.md)
 distinguishes handoffs from parallel coding and checkpoints from accepted state.
 
+The [storage proposal](docs/storage-and-retrieval.md) prioritizes PostgreSQL for
+coordination, staged retrieval and optional backend adapters. The
+[database and swarm review](docs/research/2026-10-20-mongodb-postgresql-and-swarms.md)
+records technical corrections, access limits and evaluation requirements.
+
 ## Contribute
 
 Start with [scope](docs/scope.md), [roadmap](docs/roadmap.md), and

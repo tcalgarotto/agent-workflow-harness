@@ -172,3 +172,8 @@ recheck conformance on upgrades. These are future tests, not executed results.
 
 Runtime branching/delegation needs its own versioned protocol. Today's version-1
 workflow schema is a static DAG and does not validate this execution design.
+
+The [storage proposal](storage-and-retrieval.md) develops the PostgreSQL-first
+baseline, optional pgvector/MongoDB retrieval, source freshness and index lifecycle.
+Choosing a LangGraph store/checkpointer does not choose the coordination protocol
+or certify another backend's isolation.

@@ -48,3 +48,8 @@ In a LangGraph integration, checkpointers hold engine progress and stores can
 expose cross-thread memory. Neither replaces the core's accepted task records or
 Git-reviewed knowledge. Authorize namespace access and resume at the service
 boundary; see the [persistence mapping](langchain-integration.md#persistence-and-shared-memory).
+
+The [storage proposal](storage-and-retrieval.md) prioritizes PostgreSQL operational
+records with validated JSONB metadata and staged retrieval, while keeping MongoDB
+or other retrievers behind an adapter. It adds freshness, revocation, index
+generation and filtered-recall requirements; no database is implemented yet.

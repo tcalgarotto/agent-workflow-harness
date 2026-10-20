@@ -119,3 +119,9 @@ The [LangChain integration proposal](langchain-integration.md) maps this design 
 bounded LangGraph branches and optional worker loops. Conversational handoff
 and concurrent coding execution are separate capabilities; a swarm package name
 does not establish the latter.
+
+Future operator interfaces should render typed task/diff/evidence views. Generated
+forms and client-supplied action fields still require server-side identity, scope,
+revision and operation validation through the existing service boundary. No UI
+component can grant authority or bypass integration gates. See the
+[additional swarm review](research/2026-10-20-mongodb-postgresql-and-swarms.md).

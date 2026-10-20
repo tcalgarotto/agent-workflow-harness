@@ -21,6 +21,11 @@ Agents workers, and a replaceable telemetry exporter. See
 [ADR 0004](decisions/0004-langgraph-first-engine-adapter.md). No library dependency
 or runtime capability is added by that proposal.
 
+The [storage proposal](storage-and-retrieval.md) prioritizes PostgreSQL for the
+first persistent coordinator and treats lexical/vector retrieval as replaceable
+projections. Database transactions, checkpoint storage and search freshness have
+separate semantics. See [ADR 0005](decisions/0005-postgresql-first-storage-and-retrieval.md).
+
 ## Authorities
 
 - Accepted requirements, decisions, and code: versioned Git revisions.

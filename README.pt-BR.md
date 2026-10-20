@@ -37,5 +37,10 @@ Deep Agents opcionais e observabilidade substituível. O
 [estudo das fontes](docs/research/2026-10-20-langchain-ecosystem.md) registra as
 responsabilidades, limitações e critérios antes da implementação.
 
+A [proposta de armazenamento e busca](docs/storage-and-retrieval.md) prioriza
+PostgreSQL para coordenação, recuperação por etapas e adaptadores opcionais.
+O [estudo de bancos e enxames](docs/research/2026-10-20-mongodb-postgresql-and-swarms.md)
+registra correções técnicas, limites de acesso às fontes e critérios de avaliação.
+
 Licença Apache-2.0. Nenhuma ferramenta elimina todos os erros de modelos;
 permissões, evidências e validações precisam existir fora do LLM.
