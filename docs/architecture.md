@@ -39,6 +39,13 @@ revisions. Updating a graph checkpoint does not atomically update an external
 service. Use transactions, idempotency, durable events, and reconciliation at the
 appropriate boundaries.
 
+Proposed extension: bind intended behavior to source evidence before mutation and
+revalidate mutable preconditions at the effect boundary. Add an evaluation plane
+that measures actions and outcomes independently of permission checks. See
+[ADR 0002](decisions/0002-evidence-grounding-and-evaluation.md) and
+[evaluation design](evaluation.md). These are target-runtime proposals, not
+additional guarantees of the current validator.
+
 ## Change discipline
 
 Use proportional tracks: lightweight documentation checks; standard behavior

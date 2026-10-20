@@ -24,6 +24,13 @@ hashes, evidence anchors, index generation, and model version. Filter on authori
 project/revision; isolate caches and unmerged branch overlays. Never promote
 another run's proposal to accepted policy through search.
 
+Proposed runtime rule: distinguish discovery context from authoritative state for
+an action. A historical document or similarity result does not establish a live
+setting. Cache approved maps and procedures by revision, but invalidate affected
+context when its sources change. Recheck mutable action preconditions rather
+than treating a cached observation or permission as permanent authority. See
+[evaluation design](evaluation.md#evidence-before-mutation).
+
 RAG cannot guarantee factual correctness. Require traceable sources, distinguish
 proposals from observations, expose contradictions, and return insufficient
 evidence when appropriate. Search scores are not truth probabilities. Evaluate

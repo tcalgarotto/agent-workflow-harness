@@ -65,6 +65,10 @@ The diagram is the target architecture, not a list of completed features.
 LangGraph, Langfuse, LangChain, search engines, and model providers are replaceable
 integration points. MCP exposes tools; it does not replace authorization or a sandbox.
 
+Proposed next steps: [evidence and evaluation design](docs/evaluation.md), informed
+by a [source review of DoorDash, ADK, and AWS](docs/research/2026-10-20-doordash-adk-aws.md).
+These documents do not expand the prototype's implemented capabilities.
+
 ## Contribute
 
 Start with [scope](docs/scope.md), [roadmap](docs/roadmap.md), and
