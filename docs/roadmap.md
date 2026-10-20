@@ -11,15 +11,20 @@ This is a sequence of evidence-based milestones, not a delivery-date promise.
 
 ## Local coordination
 
-- [ ] Authenticated service boundary and durable task state machine.
-- [ ] Atomic claims, resource conflicts, lease renewal and fencing.
-- [ ] PostgreSQL-first persistent coordinator with tested isolation and resource-overlap admission.
-- [ ] Concurrency, expiration, crash, and reconciliation tests.
+- [x] Authenticated local service boundary and durable task state machine (M1).
+- [x] Atomic project-local claims, resource conflicts, lease renewal and fencing (M1 API).
+- [x] PostgreSQL coordinator with tested transactional resource-overlap admission.
+- [x] Concurrency, expiration, transaction failure, restart and controller reconciliation tests.
+- [ ] External effect gateway rejecting stale authority (M2).
 - [ ] Evidence-bound intended behavior and revalidation of mutable preconditions.
 - [ ] Delegation lineage, bounded task mailboxes, and cumulative budgets across resume.
 
 Exit: two workers cannot obtain incompatible active authority; stale tokens cannot
 produce shared effects. A database row alone is insufficient.
+
+[M1](m1-coordination.md) implements logical grants and explicit controller
+attestations. External effects, governed delegation and bounded mailboxes remain
+open; this milestone group is not complete end-to-end.
 
 ## Controlled execution
 

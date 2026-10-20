@@ -1,7 +1,11 @@
 # Contract semantics
 
-All documents use schema_version `1`, reject unknown properties, and belong to a
+All static bundle documents use schema_version `1`, reject unknown properties, and belong to a
 project_id. Schemas are packaged in src/agent_workflow_harness/schemas.
+
+The optional [M1 API](m1-coordination.md) has separate `protocol: "m1"` project/task
+documents and typed operation contracts. It does not accept a static bundle as
+execution authorization or extend the v1 schemas implicitly.
 
 | Contract | Purpose |
 |---|---|

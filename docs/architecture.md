@@ -1,11 +1,13 @@
 # Target architecture
 
-This describes the intended runtime. The current release only validates contracts.
+This describes the intended end-to-end runtime. The project implements static
+contract validation and the optional [M1 coordinator](m1-coordination.md).
+Agent execution, sandboxing, retrieval and protected integration remain planned.
 
 Start with the [operational blueprint and interactive maps](blueprint/index.html)
 for the end-to-end plan, three-worker example, recovery paths and implementation
-milestones. Its [Portuguese source](blueprint/README.pt-BR.md) distinguishes the
-existing validator from proposed services and controls.
+milestones. Its [Portuguese source](blueprint/README.pt-BR.md) is a dated design
+snapshot; the [M1 guide](m1-coordination.md) records current implementation status.
 
 ## Reusable layers
 
