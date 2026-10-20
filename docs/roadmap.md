@@ -15,22 +15,22 @@ This is a sequence of evidence-based milestones, not a delivery-date promise.
 - [x] Atomic project-local claims, resource conflicts, lease renewal and fencing (M1 API).
 - [x] PostgreSQL coordinator with tested transactional resource-overlap admission.
 - [x] Concurrency, expiration, transaction failure, restart and controller reconciliation tests.
-- [ ] External effect gateway rejecting stale authority (M2).
-- [ ] Evidence-bound intended behavior and revalidation of mutable preconditions.
+- [x] Local Git effect gateway rejecting stale authority (M2b; other destinations remain open).
+- [x] Exact combined-content evidence and revalidation of the accepted Git base (M2b).
 - [ ] Delegation lineage, bounded task mailboxes, and cumulative budgets across resume.
 
 Exit: two workers cannot obtain incompatible active authority; stale tokens cannot
 produce shared effects. A database row alone is insufficient.
 
 [M1](m1-coordination.md) implements logical grants and explicit controller
-attestations. External effects, governed delegation and bounded mailboxes remain
+attestations. M2b adds the local Git effect boundary; other effects, governed delegation and bounded mailboxes remain
 open; this milestone group is not complete end-to-end.
 
 ## Controlled execution
 
 - [x] M2a Linux/Docker command executor and separate content-bound validation runner.
 - [x] M2a real containment, cancellation/recovery and authenticated receipt tests.
-- [ ] Revision-bound evidence and protected integration gateway.
+- [x] M2b revision-bound evidence and protected local Git integration gateway.
 - [ ] One real adapter passing conformance tests.
 - [ ] Task-specific completeness checks and isolation of hidden build/test state.
 

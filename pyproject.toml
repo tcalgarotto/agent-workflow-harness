@@ -31,6 +31,7 @@ Issues = "https://github.com/tcalgarotto/agent-workflow-harness/issues"
 awh = "agent_workflow_harness.cli:main"
 awh-coordinator = "agent_workflow_harness.coordinator.cli:main"
 awh-supervisor = "agent_workflow_harness.supervisor.cli:main"
+awh-integrate = "agent_workflow_harness.integration.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

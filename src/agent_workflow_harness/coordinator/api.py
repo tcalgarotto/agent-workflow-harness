@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Loopback M1 API; no subprocess, model, Git or integration endpoints."""
+"""Loopback coordinator API; integration reads, no Git/model effect endpoints."""
 import json
 from typing import Annotated
 
@@ -109,5 +109,9 @@ def create_app(store, auth):
     @app.get("/v1/projects/{project_id}/executions/{execution_id}")
     def execution_get(project_id: Identifier, execution_id: str, principal=Depends(identity)):
         return store.read(principal, project_id, "execution", execution_id)
+
+    @app.get("/v1/projects/{project_id}/integrations/{integration_id}")
+    def integration_get(project_id: Identifier, integration_id: str, principal=Depends(identity)):
+        return store.read(principal, project_id, "integration", integration_id)
 
     return app

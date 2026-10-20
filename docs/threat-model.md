@@ -23,3 +23,22 @@ authorization endpoint without a separate authenticated service and resource lim
 The runtime must not grant workers host Docker sockets, unrestricted integration
 credentials, or direct protected-branch writes while claiming enforced isolation.
 No zero-hallucination or universal cancellation guarantee is possible.
+
+## Implemented local effect boundary
+
+[M2b](m2b-integration.md) protects a gateway-owned private bare Git repository.
+Its immutable policy, registered authenticated receipts, accepted contract/scope,
+current grants, protected-check review and exact combined-content validator are
+checked before a durable commit permit. Git CAS prevents a stale candidate from
+overwriting an accepted advance. Pending permits retain task/resources until Git
+and SQL are reconciled, including a successful Git effect with lost SQL completion.
+The permit is a point of no return for authorization; subsequent cancellation
+waits for reconciliation. Marker-only inconsistent effects remain quarantined.
+
+The trusted host, Docker daemon, local Git configuration, database credentials,
+receipt key and operator validation oracle remain trusted. Administrators can
+bypass these controls; candidate containers do not receive that access. Integrity
+checks cannot detect every semantic weakening of a test through arbitrary source
+changes. Protect all oracle inputs and use independent review. Remote Git hosting,
+untrusted host shells, cross-host failover and arbitrary external effects are not
+covered by this local boundary.

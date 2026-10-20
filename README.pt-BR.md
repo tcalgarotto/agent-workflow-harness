@@ -22,6 +22,11 @@ validação sobre um candidato exato, em outro ambiente somente para leitura.
 O perfil usa daemon Docker rootful e processos candidatos sem root; não é Docker
 rootless nem certificação de isolamento para produção.
 
+O [gateway M2b](docs/m2b-integration.md) confere autoridade, escopo e recibos,
+revalida a combinação com a base atual e integra em Git bare privado e local com
+compare-and-swap e recuperação de falhas. Alterar checks protegidos exige revisão
+explícita e vinculada ao diff. Publicação remota no GitHub continua separada.
+
 Ainda não executa agentes de IA, não oferece RAG ou
 integrações com fornecedores. As declarações de capacidade são verificadas quanto
 à consistência; seu cumprimento real ainda depende de testes futuros dos runners.

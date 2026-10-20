@@ -1,0 +1,38 @@
+{
+  "version": "m2b",
+  "project_id": "demo",
+  "repository": "/absolute/private/accepted.git",
+  "supervisor_state": "/absolute/private/supervisor-state",
+  "branch": "refs/heads/main",
+  "profile": {
+    "version": "m2a",
+    "image": "python:3.14-slim-bookworm@sha256:48b13b003dda20b16f9442b8475aa05fe21bf6579a8c881db92ffb4d8fd20f83",
+    "worker_command": [
+      "/usr/local/bin/python",
+      "-I",
+      "-c",
+      "from pathlib import Path; Path('src/api/result.txt').write_text('ready')"
+    ],
+    "validator_command": [
+      "/usr/local/bin/python",
+      "-I",
+      "-S",
+      "-c",
+      "from pathlib import Path; assert Path('src/api/result.txt').read_text() == 'ready'"
+    ],
+    "timeout_seconds": 10,
+    "memory_mb": 128,
+    "pids": 32,
+    "cpu_millis": 500,
+    "workspace_mb": 16,
+    "output_bytes": 65536
+  },
+  "protected_paths": [
+    "checks/",
+    "src/agent_workflow_harness/integration/",
+    "src/agent_workflow_harness/coordinator/",
+    "src/agent_workflow_harness/supervisor/",
+    "src/agent_workflow_harness/validation.py",
+    "src/agent_workflow_harness/schemas/"
+  ]
+}

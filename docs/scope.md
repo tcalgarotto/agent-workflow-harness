@@ -34,9 +34,21 @@ mounts/credentials/control sockets, project-local write scopes, memory/CPU/PID,
 time and output bounds, confirmed stop/recovery and private content snapshots.
 A separate read-only container runs the operator's validation command. The host
 supervisor authenticates exact-input receipts; this does not prove a correct test
-oracle or grant integration permission. Rootless/other OS profiles, AI runners
-and the external-effect/merge gateway remain unimplemented. No VM boundary or
+oracle or grant integration permission. Rootless/other OS profiles and AI runners
+remain unimplemented. No VM boundary or
 production isolation certification is claimed.
+
+The optional [M2b gateway](m2b-integration.md) implements a bounded local Git
+effect boundary: live authority/contract and registered receipt checks, scope,
+operator-owned immutable policy, protected-check review, exact combined-result
+validation and Git compare-and-swap with durable permit reconciliation. It uses
+a private bare repository and never exposes Git/SQL credentials to candidates.
+Registered projects cannot complete through manual M1 attestation. A prepared
+permit fences cancellation/expiration until reconciliation; it is not a promise
+of instant revocation after an external effect was authorized. Remote publication,
+general effect gateways, multi-host recovery and arbitrary Git trees/builds remain
+outside this implementation. Operators, host services, validation oracles and
+their configuration remain trusted.
 
 No vendor integration has been certified. No deployment, retrieval quality, or
 hallucination-rate guarantee is provided.

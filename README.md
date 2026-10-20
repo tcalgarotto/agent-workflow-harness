@@ -21,14 +21,20 @@ claims, leases/fencing, cumulative operation budgets and transactional outbox.
 The optional [M2a supervisor](docs/m2a-supervisor.md) adds bounded Linux/Docker
 execution, per-run files, cancellation/recovery and authenticated receipts for
 an exact candidate validated in a separate read-only environment.
+The optional [M2b gateway](docs/m2b-integration.md) binds these receipts to live
+authority, revalidates the exact combination with the current accepted base,
+protects checks and integrates through a private local Git repository with
+compare-and-swap and crash reconciliation.
 
 **Not implemented:** AI agent/provider execution,
 a LangGraph runtime, RAG, MCP endpoints, provider adapters,
-or a merge gateway. Validating a declaration does not prove that a runner enforces
+or remote GitHub publication. Validating a declaration does not prove that a runner enforces
 it. This is not production security software and does not promise zero hallucinations.
 
 M1 records trusted controller decisions; M2a supervises its own containers and
-binds validation results to content. The first supported execution profile uses
+binds validation results to content. M2b implements the bounded local Git effect
+boundary, with a separate integrator identity and explicit protected-check review.
+The first supported execution profile uses
 a trusted rootful Docker daemon and non-root candidate processes, not rootless
 Docker or production isolation certification. See the [M2a limits and setup](docs/m2a-supervisor.md).
 

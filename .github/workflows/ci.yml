@@ -101,3 +101,4 @@ jobs:
           AWH_DATABASE_URL="$AWH_TEST_DATABASE_URL" awh-coordinator migrate
           awh check "$GITHUB_WORKSPACE/examples/minimal"
           awh-supervisor --help
+          awh-integrate --help

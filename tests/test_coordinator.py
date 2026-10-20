@@ -368,10 +368,19 @@ class CoordinatorTests(unittest.TestCase):
         try:
             self.store.create_project(self.controller,Project(protocol="m1",project_id="demo",
                 resources=["path:src/"],max_active_runs=3,budget_limit=100,max_lease_seconds=60,max_run_seconds=300))
-            self.task()
+            # Seed historical accepted state without running current mutations
+            # against a schema that current service startup rejects.
+            historical = self.task(accept=False)
+            from agent_workflow_harness.coordinator.store import digest
+            with self.store.connection() as c:
+                c.execute("UPDATE awh_m1.tasks SET state='ready',revision=2,accepted_revision=2,contract_hash=%s",
+                          (digest(historical["document"]),))
             self.store.migrate()
             self.assertEqual(self.get_task()["state"],"ready")
             self.store.verify_schema()
+            with self.store.connection() as c:
+                self.assertEqual([row["version"] for row in c.execute(
+                    "SELECT version FROM awh_m1.schema_version ORDER BY version")], [1, 2, 3])
             with self.store.connection() as c:c.execute("UPDATE awh_m1.schema_version SET checksum='modified' WHERE version=2")
             with self.assertRaisesRegex(Rejected,"checksum_mismatch"):self.store.migrate()
         finally:

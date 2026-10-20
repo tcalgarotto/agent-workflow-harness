@@ -54,7 +54,7 @@ class Store:
             yield conn
 
     def _migrations(self):
-        return [(n, files(__package__).joinpath("migrations", f"{n:03d}.sql").read_text()) for n in (1, 2)]
+        return [(n, files(__package__).joinpath("migrations", f"{n:03d}.sql").read_text()) for n in (1, 2, 3)]
 
     def migrate(self):
         with self.connection() as c:
@@ -123,7 +123,9 @@ class Store:
 
     def _expire(self, c, pid):
         rows = c.execute("UPDATE awh_m1.runs SET state='expired' WHERE project_id=%s "
-                         "AND state='active' AND lease_until <= clock_timestamp() RETURNING *",
+                         "AND state='active' AND lease_until <= clock_timestamp() AND NOT EXISTS "
+                         "(SELECT 1 FROM awh_m1.integrations i WHERE i.project_id=awh_m1.runs.project_id "
+                         "AND i.run_id=awh_m1.runs.run_id AND i.state='prepared') RETURNING *",
                          (pid,)).fetchall()
         for run in rows:
             c.execute("UPDATE awh_m1.tasks SET state='reconciling',revision=revision+1 "
@@ -193,6 +195,22 @@ class Store:
 
     def _dispatch(self, c, project, principal, cmd, expired):
         pid, op = project["project_id"], cmd.operation
+        # A durable Git permit is a point of no return. Cancellation, expiration
+        # and resource release wait until the gateway reconciles its effect.
+        if hasattr(cmd, "run_id"):
+            pending = c.execute("SELECT 1 FROM awh_m1.integrations WHERE project_id=%s "
+                                "AND run_id=%s AND state='prepared'", (pid, cmd.run_id)).fetchone()
+        elif hasattr(cmd, "task_id"):
+            pending = c.execute("SELECT 1 FROM awh_m1.integrations i JOIN awh_m1.runs r "
+                                "USING(project_id,run_id) WHERE i.project_id=%s "
+                                "AND r.task_id=%s AND i.state='prepared'", (pid, cmd.task_id)).fetchone()
+        else:
+            pending = None
+        if pending:
+            raise Rejected("integration_reconciliation_required")
+        if op == "finish" or (op == "decide" and cmd.outcome == "complete"):
+            if c.execute("SELECT 1 FROM awh_m1.integration_policies WHERE project_id=%s", (pid,)).fetchone():
+                raise Rejected("governed_project_requires_integration")
         if op == "sweep":
             return {"expired": expired}
         if op == "submit":
@@ -213,6 +231,10 @@ class Store:
             run = self._run(c, pid, cmd.run_id)
             if run["fence"] != cmd.fencing_token:
                 raise Rejected("stale_fencing_token")
+            if op in {"finish", "reconcile"} and c.execute(
+                    "SELECT 1 FROM awh_m1.integrations WHERE project_id=%s AND run_id=%s "
+                    "AND state IN ('validating','prepared')", (pid, cmd.run_id)).fetchone():
+                raise Rejected("integration_reconciliation_required")
             if op in {"finish", "reconcile"} and c.execute(
                     "SELECT 1 FROM awh_m1.executions WHERE project_id=%s AND run_id=%s AND state='admitted'",
                     (pid, cmd.run_id)).fetchone():
@@ -427,6 +449,11 @@ class Store:
                                   (pid, identifier)).fetchone()
                 if not value:
                     raise Rejected("execution_not_found", 404)
+            elif kind == "integration":
+                value = c.execute("SELECT * FROM awh_m1.integrations WHERE project_id=%s AND integration_id=%s",
+                                  (pid, identifier)).fetchone()
+                if not value:
+                    raise Rejected("integration_not_found", 404)
             elif kind == "tasks":
                 value = c.execute("SELECT * FROM awh_m1.tasks WHERE project_id=%s AND task_id>%s "
                                   "ORDER BY task_id LIMIT %s", (pid, after_task, limit)).fetchall()
