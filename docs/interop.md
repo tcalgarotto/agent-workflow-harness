@@ -34,6 +34,12 @@ engine. Do not run competing schedulers over the same task authority. A supporte
 model interface is not equivalent to controlling an authenticated coding runner.
 See the [source review](research/2026-10-20-doordash-adk-aws.md).
 
+The [ecosystem integration proposal](langchain-integration.md) prioritizes one
+LangGraph engine experiment without removing the engine interface. It separates
+LangChain model/tool components, optional Deep Agents worker loops, conversational
+swarm handoffs, and LangSmith telemetry. None certifies another layer's authority
+or isolation. See the [LangChain source review](research/2026-10-20-langchain-ecosystem.md).
+
 ## Native teams and goals are optional capabilities
 
 Report child-spawning visibility, inherited enforcement, message delivery,

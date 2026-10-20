@@ -15,6 +15,12 @@ provide durable orchestration, Langfuse can receive instrumented traces, and
 LangChain can supply retrieval/tool components. None is the authority for all
 project data. See interop.md and memory.md.
 
+The [LangChain integration proposal](langchain-integration.md) prioritizes LangGraph
+for the first engine experiment, selected LangChain components, optional Deep
+Agents workers, and a replaceable telemetry exporter. See
+[ADR 0004](decisions/0004-langgraph-first-engine-adapter.md). No library dependency
+or runtime capability is added by that proposal.
+
 ## Authorities
 
 - Accepted requirements, decisions, and code: versioned Git revisions.

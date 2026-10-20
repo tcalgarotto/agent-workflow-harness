@@ -32,10 +32,12 @@ Exit: cross-workspace writes fail and changes after verification invalidate rece
 ## Portable workflows and memory
 
 - [ ] Persistent workflow engine adapter and event reconciliation.
+- [ ] LangGraph-first experiment with persistent checkpoints, crash/replay tests and bounded fan-out.
 - [ ] Knowledge proposals, immutable source revisions, and context manifests.
 - [ ] Task-scoped memory with revision conflicts, curated journals, and explicit promotion.
 - [ ] Exact/lexical retrieval baseline before vector/BM25/reranker experiments.
 - [ ] Instrumented observability and held-out evaluations.
+- [ ] Opt-in sanitized exporter; evaluate LangSmith against the existing Langfuse candidate.
 - [ ] Versioned tool fixtures and action/outcome evaluation before provider tuning.
 
 ## Reuse and remote execution
@@ -54,3 +56,6 @@ implemented tests yet. Compare optional engine/provider adapters only after the
 common controls have evidence. See [ADR 0002](decisions/0002-evidence-grounding-and-evaluation.md).
 The [team and memory proposal](decisions/0003-portable-task-memory-and-development-teams.md)
 adds portability and recovery acceptance criteria without implementing them yet.
+The [LangChain integration proposal](langchain-integration.md) assigns ecosystem
+components specific jobs and adds engine/memory/export acceptance criteria. It
+does not add dependencies or require managed hosting.

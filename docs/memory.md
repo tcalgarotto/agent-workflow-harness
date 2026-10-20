@@ -43,3 +43,8 @@ The proposed [task memory design](task-memory.md) defines the logical shared
 workspace, typed updates, context snapshots, journals, and knowledge promotion
 for cooperating workers. A native agent's persistent memory is an attributed
 input, not automatically an accepted project decision.
+
+In a LangGraph integration, checkpointers hold engine progress and stores can
+expose cross-thread memory. Neither replaces the core's accepted task records or
+Git-reviewed knowledge. Authorize namespace access and resume at the service
+boundary; see the [persistence mapping](langchain-integration.md#persistence-and-shared-memory).

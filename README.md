@@ -75,6 +75,11 @@ Further proposals cover [development teams](docs/development-teams.md),
 They keep native teams, task journals, and cross-runner collaboration behind
 explicit authority and conformance boundaries.
 
+The [LangChain ecosystem proposal](docs/langchain-integration.md) prioritizes a
+LangGraph engine experiment, selected LangChain components, optional Deep Agents
+workers, and replaceable observability. Its [source review](docs/research/2026-10-20-langchain-ecosystem.md)
+distinguishes handoffs from parallel coding and checkpoints from accepted state.
+
 ## Contribute
 
 Start with [scope](docs/scope.md), [roadmap](docs/roadmap.md), and

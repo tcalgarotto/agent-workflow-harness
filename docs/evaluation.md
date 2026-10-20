@@ -104,6 +104,11 @@ to the existing project policy.
 | Two workers accept conflicting decisions at one revision | Accept at most one; require explicit reconciliation |
 | Duplicate or stale teammate message arrives after restart | Deduplicate and prevent unauthorized state transitions |
 | Native board and central task service disagree | Reconcile through the central authority before granting work |
+| Process crashes after an effect but before its graph checkpoint | Recover its trusted result or expose uncertainty before any retry |
+| Replay or resume restores a formerly valid approval | Recheck current scope, arguments, revisions and authority |
+| Worker requests another task's thread or store namespace | Reject unauthorized reads, writes, enumeration and resume |
+| Nested tool payload includes synthetic sensitive data | Omit/redact it before any enabled external trace export |
+| Telemetry exporter is unavailable | Preserve mandatory local evidence and apply the explicit audit policy |
 
 These are future acceptance cases, not executed test results. Today's schema
 validator cannot establish those runtime properties.
@@ -112,6 +117,11 @@ For each collaboration topology, compare with a single-worker baseline. Measure
 handoff loss, coordination overhead, stale context, conflicts, queue saturation,
 and accepted outcomes as well as token use. Model diversity is a test variable,
 not proof of independent judgment. See [development teams](development-teams.md).
+
+External architecture benchmarks are workload-specific. The reviewed retail
+benchmark evaluated distractor context with little coordination, not concurrent
+code changes. Our fixtures must cover repository conflicts, task handoffs,
+integration and recovery. See the [LangChain source review](research/2026-10-20-langchain-ecosystem.md).
 
 ## Measure configurations under hard constraints
 

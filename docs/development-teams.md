@@ -114,3 +114,8 @@ messages cannot overwrite accepted decisions; and changed code invalidates
 validation. Exercise a failed or disconnected teammate and a saturated reviewer
 queue. Then repeat the same task contracts using two different real runners.
 These are proposed acceptance cases, not completed runtime tests.
+
+The [LangChain integration proposal](langchain-integration.md) maps this design to
+bounded LangGraph branches and optional worker loops. Conversational handoff
+and concurrent coding execution are separate capabilities; a swarm package name
+does not establish the latter.
