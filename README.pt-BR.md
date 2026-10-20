@@ -16,7 +16,13 @@ O [coordenador M1 opcional](docs/m1-coordination.md) implementa API local autent
 estado em PostgreSQL, reservas exclusivas, leases/fencing, orçamento cumulativo e
 outbox transacional. Consulte o guia para instalar, executar e conhecer os limites.
 
-Ainda não executa agentes, não oferece sandbox, RAG ou
+O [supervisor M2a](docs/m2a-supervisor.md) acrescenta execução limitada em
+Linux/Docker, arquivos por run, cancelamento/recuperação e recibos autenticados de
+validação sobre um candidato exato, em outro ambiente somente para leitura.
+O perfil usa daemon Docker rootful e processos candidatos sem root; não é Docker
+rootless nem certificação de isolamento para produção.
+
+Ainda não executa agentes de IA, não oferece RAG ou
 integrações com fornecedores. As declarações de capacidade são verificadas quanto
 à consistência; seu cumprimento real ainda depende de testes futuros dos runners.
 

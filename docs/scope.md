@@ -28,5 +28,15 @@ execute agents, stop processes, enforce filesystem permissions, intercept model
 calls or provide a shared-effect gateway. Stale grants are rejected by M1
 mutations, not by external systems that have not yet integrated enforcement.
 
+The optional [M2a supervisor](m2a-supervisor.md) runs commands in a tested
+Linux/rootful-Docker profile with non-root candidate processes, no host bind
+mounts/credentials/control sockets, project-local write scopes, memory/CPU/PID,
+time and output bounds, confirmed stop/recovery and private content snapshots.
+A separate read-only container runs the operator's validation command. The host
+supervisor authenticates exact-input receipts; this does not prove a correct test
+oracle or grant integration permission. Rootless/other OS profiles, AI runners
+and the external-effect/merge gateway remain unimplemented. No VM boundary or
+production isolation certification is claimed.
+
 No vendor integration has been certified. No deployment, retrieval quality, or
 hallucination-rate guarantee is provided.

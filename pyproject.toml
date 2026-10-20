@@ -21,6 +21,7 @@ classifiers = [
 dev = ["build>=1,<2"]
 coordinator = ["fastapi>=0.115,<1", "pydantic>=2.9,<3", "uvicorn>=0.30,<1", "psycopg[binary]>=3.2,<4"]
 coordinator-test = ["httpx>=0.27,<1"]
+supervisor = ["docker>=7.1,<8", "pydantic>=2.9,<3", "httpx>=0.27,<1"]
 
 [project.urls]
 Homepage = "https://github.com/tcalgarotto/agent-workflow-harness"
@@ -29,6 +30,7 @@ Issues = "https://github.com/tcalgarotto/agent-workflow-harness/issues"
 [project.scripts]
 awh = "agent_workflow_harness.cli:main"
 awh-coordinator = "agent_workflow_harness.coordinator.cli:main"
+awh-supervisor = "agent_workflow_harness.supervisor.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

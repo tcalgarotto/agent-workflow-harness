@@ -355,6 +355,31 @@ class CoordinatorTests(unittest.TestCase):
         self.assertEqual(cancelled["state"], "cancelled")
         self.assertEqual(self.store.read(self.worker, "demo", "run", run["run_id"])["state"], "revoked")
 
+    def test_upgrade_from_m1_preserves_tasks_and_rejects_modified_migrations(self):
+        # Reconstruct the exact pre-M2a schema inside this disposable database.
+        from importlib.resources import files
+        source=files("agent_workflow_harness.coordinator").joinpath("migrations","001.sql").read_text()
+        with self.store.connection() as c:
+            c.execute("DROP SCHEMA awh_m1 CASCADE")
+            c.execute("CREATE SCHEMA awh_m1")
+            c.execute("CREATE TABLE awh_m1.schema_version(version integer PRIMARY KEY,checksum text NOT NULL)")
+            c.execute(source)
+            c.execute("INSERT INTO awh_m1.schema_version VALUES (1,%s)",(hashlib.sha256(source.encode()).hexdigest(),))
+        try:
+            self.store.create_project(self.controller,Project(protocol="m1",project_id="demo",
+                resources=["path:src/"],max_active_runs=3,budget_limit=100,max_lease_seconds=60,max_run_seconds=300))
+            self.task()
+            self.store.migrate()
+            self.assertEqual(self.get_task()["state"],"ready")
+            self.store.verify_schema()
+            with self.store.connection() as c:c.execute("UPDATE awh_m1.schema_version SET checksum='modified' WHERE version=2")
+            with self.assertRaisesRegex(Rejected,"checksum_mismatch"):self.store.migrate()
+        finally:
+            # Restore only the deliberately altered migration receipt for later tests.
+            migration=files("agent_workflow_harness.coordinator").joinpath("migrations","002.sql").read_text()
+            with self.store.connection() as c:
+                c.execute("UPDATE awh_m1.schema_version SET checksum=%s WHERE version=2",(hashlib.sha256(migration.encode()).hexdigest(),))
+
 
 if __name__ == "__main__":
     unittest.main()
