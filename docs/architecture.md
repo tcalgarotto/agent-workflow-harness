@@ -46,6 +46,13 @@ that measures actions and outcomes independently of permission checks. See
 [evaluation design](evaluation.md). These are target-runtime proposals, not
 additional guarantees of the current validator.
 
+Proposed collaboration layer: [development teams](development-teams.md) use a
+single task authority, bounded delegation, addressed messages, and controlled
+integration. [Task-scoped memory](task-memory.md) supplies accepted context,
+attributed observations, proposals, and reusable journals. Native team boards and
+goal verdicts do not become a second authority. See
+[ADR 0003](decisions/0003-portable-task-memory-and-development-teams.md).
+
 ## Change discipline
 
 Use proportional tracks: lightweight documentation checks; standard behavior

@@ -38,3 +38,8 @@ retrieval and supported claims on representative held-out tasks.
 
 Current status: design only. No memory server, embeddings, indexes, or RAG calls
 are implemented in this repository.
+
+The proposed [task memory design](task-memory.md) defines the logical shared
+workspace, typed updates, context snapshots, journals, and knowledge promotion
+for cooperating workers. A native agent's persistent memory is an attributed
+input, not automatically an accepted project decision.

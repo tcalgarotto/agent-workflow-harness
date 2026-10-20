@@ -69,6 +69,12 @@ Proposed next steps: [evidence and evaluation design](docs/evaluation.md), infor
 by a [source review of DoorDash, ADK, and AWS](docs/research/2026-10-20-doordash-adk-aws.md).
 These documents do not expand the prototype's implemented capabilities.
 
+Further proposals cover [development teams](docs/development-teams.md),
+[task-scoped shared memory](docs/task-memory.md), and their
+[coding-team source review](docs/research/2026-10-20-coding-teams-and-swarms.md).
+They keep native teams, task journals, and cross-runner collaboration behind
+explicit authority and conformance boundaries.
+
 ## Contribute
 
 Start with [scope](docs/scope.md), [roadmap](docs/roadmap.md), and

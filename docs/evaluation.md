@@ -99,9 +99,19 @@ to the existing project policy.
 | Retrieved text orders a policy bypass | Treat it as data and reject unauthorized operations |
 | Judge approves an outcome after a policy violation | Preserve the blocking operational failure |
 | Different safe trajectories reach the verified outcome | Accept alternatives rather than one exact sequence |
+| Hidden child or retry exceeds the task's remaining budget | Deny further authority; preserve cumulative consumption |
+| Native goal reports success without required receipts | Keep delivery unaccepted and expose missing evidence |
+| Two workers accept conflicting decisions at one revision | Accept at most one; require explicit reconciliation |
+| Duplicate or stale teammate message arrives after restart | Deduplicate and prevent unauthorized state transitions |
+| Native board and central task service disagree | Reconcile through the central authority before granting work |
 
 These are future acceptance cases, not executed test results. Today's schema
 validator cannot establish those runtime properties.
+
+For each collaboration topology, compare with a single-worker baseline. Measure
+handoff loss, coordination overhead, stale context, conflicts, queue saturation,
+and accepted outcomes as well as token use. Model diversity is a test variable,
+not proof of independent judgment. See [development teams](development-teams.md).
 
 ## Measure configurations under hard constraints
 

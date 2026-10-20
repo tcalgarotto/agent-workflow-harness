@@ -34,6 +34,19 @@ engine. Do not run competing schedulers over the same task authority. A supporte
 model interface is not equivalent to controlling an authenticated coding runner.
 See the [source review](research/2026-10-20-doordash-adk-aws.md).
 
+## Native teams and goals are optional capabilities
+
+Report child-spawning visibility, inherited enforcement, message delivery,
+native memory scopes, checkpoint semantics, and interactive/headless limitations
+for the exact adapter version. Disable ungoverned spawning for controlled writes.
+Import native task events and completion verdicts as proposals; preserve the
+harness task authority and cumulative budgets across session restarts.
+
+The [team design](development-teams.md) and
+[coding-team source review](research/2026-10-20-coding-teams-and-swarms.md) distinguish
+Claude's native primitives from a cross-platform protocol. No native feature or
+commercial compatibility claim is certified by documenting it here.
+
 References: [AGENTS.md](https://agents.md/),
 [Agent Skills](https://agentskills.io/specification),
 [MCP](https://modelcontextprotocol.io/specification/2026-07-28),

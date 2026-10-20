@@ -24,5 +24,12 @@ python3 -m venv .venv
 Consulte o [README principal](README.md), a [arquitetura](docs/architecture.md), o
 [roadmap](docs/roadmap.md) e as [regras de contribuição](CONTRIBUTING.md).
 
+As propostas de evolução incluem [times de desenvolvimento](docs/development-teams.md),
+[memória compartilhada por tarefa](docs/task-memory.md) e
+[evidências e avaliação](docs/evaluation.md). O
+[estudo sobre times e enxames](docs/research/2026-10-20-coding-teams-and-swarms.md)
+registra as fontes e seus limites. São propostas; o protótipo ainda não executa
+esses mecanismos.
+
 Licença Apache-2.0. Nenhuma ferramenta elimina todos os erros de modelos;
 permissões, evidências e validações precisam existir fora do LLM.
