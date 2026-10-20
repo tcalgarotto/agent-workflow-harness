@@ -107,10 +107,16 @@ def snapshot(directory: Path):
 
 def from_archive(chunks):
     raw = bytearray()
-    for chunk in chunks:
-        if len(raw) + len(chunk) > MAX_ARCHIVE:
-            raise UnsafeExecution("archive_limit")
-        raw.extend(chunk)
+    try:
+        for chunk in chunks:
+            if len(raw) + len(chunk) > MAX_ARCHIVE:
+                raise UnsafeExecution("archive_limit")
+            raw.extend(chunk)
+    finally:
+        # Release the Docker copy response/mount on early rejection as well.
+        close = getattr(chunks, "close", None)
+        if close:
+            close()
     tree, total, seen = {}, 0, set()
     with tarfile.open(fileobj=io.BytesIO(raw), mode="r:") as archive:
         for index, member in enumerate(archive):

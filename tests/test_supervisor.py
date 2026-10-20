@@ -251,6 +251,14 @@ else: raise AssertionError('workspace unexpectedly executable')
         self.assertIsNone(state["receipt_hash"])
         self.assert_stopped(state)
 
+    def test_oversized_candidate_archive_is_bounded_and_releases_objects(self):
+        state=self.execute(profile("from pathlib import Path;Path('src/oversized').write_bytes(b'x'*(18*1024*1024))",
+                                   workspace_mb=32))
+        self.assertEqual(state["state"],"failed",state)
+        self.assertEqual(state["error"],"archive_limit")
+        self.assertIsNone(state["receipt_hash"])
+        self.assert_stopped(state)
+
     def test_wall_timeout_kills_descendants(self):
         state = self.execute(profile("import os,time; pid=os.fork(); time.sleep(30)", timeout_seconds=1))
         self.assertEqual(state["state"], "timed_out", state)
