@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "03 · Memória por tarefa e recuperação · ARQUITETURA PLANEJADA",
+    "output": "03-memoria.html",
+    "quality_profile": "showcase"
+  },
+  "stages": [
+    {
+      "label": "Fontes"
+    },
+    {
+      "label": "Entrada"
+    },
+    {
+      "label": "Estado"
+    },
+    {
+      "label": "Recuperação"
+    },
+    {
+      "label": "Uso"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "sources",
+      "type": "database",
+      "label": "Git e fontes",
+      "sublabel": "Revisões aceitas",
+      "stage": 0,
+      "row": 0
+    },
+    {
+      "id": "observations",
+      "type": "backend",
+      "label": "Runs",
+      "sublabel": "Observações e propostas",
+      "stage": 0,
+      "row": 2
+    },
+    {
+      "id": "ingest",
+      "type": "security",
+      "label": "Ingestão",
+      "sublabel": "ACL + versão + hash",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "proposals",
+      "type": "security",
+      "label": "API tipada",
+      "sublabel": "Autoria + revisão",
+      "stage": 1,
+      "row": 2
+    },
+    {
+      "id": "accepted",
+      "type": "database",
+      "label": "Memória aceita",
+      "sublabel": "Projeto / tarefa",
+      "stage": 2,
+      "row": 0
+    },
+    {
+      "id": "pending",
+      "type": "database",
+      "label": "Propostas",
+      "sublabel": "Sem valor normativo",
+      "stage": 2,
+      "row": 2
+    },
+    {
+      "id": "query",
+      "type": "backend",
+      "label": "Busca",
+      "sublabel": "Exata e textual",
+      "stage": 3,
+      "row": 0
+    },
+    {
+      "id": "index",
+      "type": "database",
+      "label": "Índice opcional",
+      "sublabel": "pgvector / BM25",
+      "stage": 3,
+      "row": 2
+    },
+    {
+      "id": "context",
+      "type": "security",
+      "label": "Contexto válido",
+      "sublabel": "ACL e revisão atual",
+      "stage": 4,
+      "row": 0
+    },
+    {
+      "id": "journal",
+      "type": "database",
+      "label": "Diário",
+      "sublabel": "Artefatos e handoff",
+      "stage": 4,
+      "row": 2
+    }
+  ],
+  "flows": [
+    {
+      "id": "sources-ingest",
+      "from": "sources",
+      "to": "ingest",
+      "label": "fontes",
+      "variant": "default"
+    },
+    {
+      "id": "ingest-accepted",
+      "from": "ingest",
+      "to": "accepted",
+      "label": "versão validada",
+      "variant": "security"
+    },
+    {
+      "id": "observations-proposals",
+      "from": "observations",
+      "to": "proposals",
+      "label": "propostas",
+      "variant": "default"
+    },
+    {
+      "id": "proposals-pending",
+      "from": "proposals",
+      "to": "pending",
+      "label": "registrar",
+      "variant": "security"
+    },
+    {
+      "id": "pending-accepted",
+      "from": "pending",
+      "to": "accepted",
+      "label": "aceite autorizado",
+      "variant": "security"
+    },
+    {
+      "id": "accepted-query",
+      "from": "accepted",
+      "to": "query",
+      "label": "leitura exata",
+      "variant": "default"
+    },
+    {
+      "id": "accepted-index",
+      "from": "accepted",
+      "to": "index",
+      "label": "geração",
+      "variant": "dashed"
+    },
+    {
+      "id": "index-query",
+      "from": "index",
+      "to": "query",
+      "label": "candidatos",
+      "variant": "default"
+    },
+    {
+      "id": "query-context",
+      "from": "query",
+      "to": "context",
+      "label": "fontes citadas",
+      "variant": "security"
+    },
+    {
+      "id": "context-journal",
+      "from": "context",
+      "to": "journal",
+      "label": "referências",
+      "variant": "default"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Memória compartilhada sem sobrescrita",
+      "items": [
+        "Observações podem divergir; proposta não é fato aceito.",
+        "Decisões aceitas exigem autorização e revisão esperada, sem last-write-wins.",
+        "O diário é uma projeção navegável; os recibos originais são imutáveis."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Antes de expor contexto ao agente",
+      "items": [
+        "Derivar projeto, tarefa e permissões da identidade autenticada.",
+        "Revalidar acesso e status no registro oficial, mesmo com índice atrasado.",
+        "Excluir fontes revogadas, propostas alheias e overlays não autorizados."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "RAG por etapas",
+      "items": [
+        "Busca exata e lexical primeiro; vetores e reranker só se medidos.",
+        "ONNX é execução de modelo; não é memória nem mecanismo de busca.",
+        "Checkpoints ficam separados e retomam progresso, nunca autoridade."
+      ]
+    }
+  ]
+}

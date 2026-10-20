@@ -4,6 +4,10 @@ Portable contracts and preflight checks for AI-assisted software development.
 
 [Português](README.pt-BR.md) · [Architecture](docs/architecture.md) · [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md)
 
+[Explore the planned workflow](docs/blueprint/index.html): five interactive
+Archify maps and a Portuguese operational blueprint. These visualize the target
+design, not a running orchestration service.
+
 Build development workflows around explicit tasks, versioned knowledge, scoped
 execution, independent verification, and controlled integration. Keep those
 contracts when changing projects, models, or agent tools.

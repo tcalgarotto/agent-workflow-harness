@@ -1,0 +1,45 @@
+{
+  "status": "planned-architecture",
+  "date": "2026-10-20",
+  "archify_version": "3.2.0",
+  "archify_source": "https://github.com/tt-a1i/archify",
+  "archify_commit": "208acba8d412335185b2056fedf54b3405df43fb",
+  "runtime_implemented": false,
+  "viewer_ui": "English",
+  "content_language": "pt-BR",
+  "diagrams": [
+    {
+      "file": "01-sistema.html",
+      "sha256": "be63774597693d82a8500d765c8c64bb63f4b074e5746a78549ea6122ee28c1a",
+      "automated_archify_checks": "pass",
+      "manual_visual_review": "reviewed-with-scope"
+    },
+    {
+      "file": "02-entrega.html",
+      "sha256": "7213991c43978d290400b459d292e6d48100801ef62d61923f30e9210f7b549c",
+      "automated_archify_checks": "pass",
+      "manual_visual_review": "reviewed-with-scope"
+    },
+    {
+      "file": "03-memoria.html",
+      "sha256": "7249b39f53b45187cc8a6ce2eabf644834f7e4ec8fff6f66c88dfe4328a36908",
+      "automated_archify_checks": "pass",
+      "manual_visual_review": "reviewed-with-scope"
+    },
+    {
+      "file": "04-recuperacao.html",
+      "sha256": "0f1b8c42fe94ecc58f716857d616b251a1a29c2906b56e51181271deb25843f6",
+      "automated_archify_checks": "pass",
+      "manual_visual_review": "reviewed-with-scope"
+    },
+    {
+      "file": "05-tres-funcionarios.html",
+      "sha256": "041747d2b2cd714eccac4294670634772195a643c526fa7fa2fcb33b73525acf",
+      "automated_archify_checks": "pass",
+      "manual_visual_review": "reviewed-with-scope"
+    }
+  ],
+  "review_scope": "Capturas claras 1440x900 dos cinco mapas; fechamento de workflow e sequence no navegador. Check automatizado também cobre os temas claro/escuro e dois viewports.",
+  "interactive_check": "Inspeção do nó Integrar abre cartão com relações de entrada/saída no navegador.",
+  "lifecycle_note": "O layout automático sinaliza cruzamentos; preservados e inspecionados visualmente, sem remover transições."
+}

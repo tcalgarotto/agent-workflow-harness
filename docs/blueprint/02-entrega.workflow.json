@@ -1,0 +1,313 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "02 · Da demanda à entrega · ARQUITETURA PLANEJADA",
+    "output": "02-entrega.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "demand",
+      "label": "Demanda e definição"
+    },
+    {
+      "id": "control",
+      "label": "Coordenação e políticas"
+    },
+    {
+      "id": "worker",
+      "label": "Execução candidata"
+    },
+    {
+      "id": "verify",
+      "label": "Validação confiável"
+    },
+    {
+      "id": "reviewer",
+      "label": "Revisão conforme política"
+    },
+    {
+      "id": "integration",
+      "label": "Integração protegida"
+    },
+    {
+      "id": "closure",
+      "label": "Memória e fechamento"
+    },
+    {
+      "id": "exceptions",
+      "label": "Esperas e correções",
+      "variant": "exception"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "intake",
+      "lane": "demand",
+      "col": 0,
+      "type": "external",
+      "label": "Demanda",
+      "sublabel": "Objetivo e projeto"
+    },
+    {
+      "id": "investigate",
+      "lane": "demand",
+      "col": 1,
+      "type": "backend",
+      "label": "Investigar",
+      "sublabel": "Fontes e estado atual"
+    },
+    {
+      "id": "contract",
+      "lane": "demand",
+      "col": 2,
+      "type": "backend",
+      "label": "Contrato",
+      "sublabel": "Escopo e critérios"
+    },
+    {
+      "id": "eligible",
+      "lane": "control",
+      "col": 2,
+      "type": "security",
+      "label": "Preflight",
+      "sublabel": "Política + capacidade"
+    },
+    {
+      "id": "claim",
+      "lane": "control",
+      "col": 3,
+      "type": "security",
+      "label": "Reservar",
+      "sublabel": "Recursos e orçamento"
+    },
+    {
+      "id": "context",
+      "lane": "worker",
+      "col": 3,
+      "type": "backend",
+      "label": "Preparar run",
+      "sublabel": "Base e contexto"
+    },
+    {
+      "id": "implement",
+      "lane": "worker",
+      "col": 4,
+      "type": "backend",
+      "label": "Executar",
+      "sublabel": "Ambiente isolado"
+    },
+    {
+      "id": "candidate",
+      "lane": "worker",
+      "col": 5,
+      "type": "database",
+      "label": "Candidato",
+      "sublabel": "Commit e evidências"
+    },
+    {
+      "id": "validate",
+      "lane": "verify",
+      "col": 5,
+      "type": "security",
+      "label": "Validar",
+      "sublabel": "Testes confiáveis"
+    },
+    {
+      "id": "review",
+      "lane": "reviewer",
+      "col": 5,
+      "type": "security",
+      "label": "Revisar",
+      "sublabel": "Conforme política"
+    },
+    {
+      "id": "merge",
+      "lane": "integration",
+      "col": 5,
+      "type": "security",
+      "label": "Integrar",
+      "sublabel": "Gates + base atual"
+    },
+    {
+      "id": "close",
+      "lane": "closure",
+      "col": 5,
+      "type": "database",
+      "label": "Concluir",
+      "sublabel": "Recibos e memória"
+    },
+    {
+      "id": "wait",
+      "lane": "exceptions",
+      "col": 2,
+      "type": "messagebus",
+      "label": "Aguardar",
+      "sublabel": "Decisão ou capacidade"
+    },
+    {
+      "id": "repair",
+      "lane": "exceptions",
+      "col": 4,
+      "type": "backend",
+      "label": "Corrigir",
+      "sublabel": "Diagnóstico limitado"
+    }
+  ],
+  "edges": [
+    {
+      "id": "intake-investigate",
+      "from": "intake",
+      "to": "investigate",
+      "variant": "default"
+    },
+    {
+      "id": "investigate-contract",
+      "from": "investigate",
+      "to": "contract",
+      "variant": "default"
+    },
+    {
+      "id": "contract-eligible",
+      "from": "contract",
+      "to": "eligible",
+      "variant": "security"
+    },
+    {
+      "id": "eligible-claim",
+      "from": "eligible",
+      "to": "claim",
+      "variant": "security",
+      "label": "apto"
+    },
+    {
+      "id": "claim-context",
+      "from": "claim",
+      "to": "context",
+      "variant": "security"
+    },
+    {
+      "id": "context-implement",
+      "from": "context",
+      "to": "implement",
+      "variant": "default"
+    },
+    {
+      "id": "implement-candidate",
+      "from": "implement",
+      "to": "candidate",
+      "variant": "default"
+    },
+    {
+      "id": "candidate-validate",
+      "from": "candidate",
+      "to": "validate",
+      "variant": "security"
+    },
+    {
+      "id": "validate-review",
+      "from": "validate",
+      "to": "review",
+      "variant": "security",
+      "label": "passou"
+    },
+    {
+      "id": "review-merge",
+      "from": "review",
+      "to": "merge",
+      "variant": "security",
+      "label": "aceito"
+    },
+    {
+      "id": "merge-close",
+      "from": "merge",
+      "to": "close",
+      "variant": "emphasis",
+      "label": "integrado"
+    },
+    {
+      "id": "eligible-wait",
+      "from": "eligible",
+      "to": "wait",
+      "variant": "security",
+      "label": "pendência",
+      "role": "branch"
+    },
+    {
+      "id": "wait-eligible",
+      "from": "wait",
+      "to": "eligible",
+      "variant": "default",
+      "label": "resolvida",
+      "role": "return"
+    },
+    {
+      "id": "validate-repair",
+      "from": "validate",
+      "to": "repair",
+      "variant": "security",
+      "label": "falhou",
+      "role": "error"
+    },
+    {
+      "id": "review-repair",
+      "from": "review",
+      "to": "repair",
+      "variant": "default",
+      "label": "ajustar",
+      "role": "branch"
+    },
+    {
+      "id": "repair-implement",
+      "from": "repair",
+      "to": "implement",
+      "variant": "default",
+      "label": "nova tentativa",
+      "role": "return"
+    }
+  ],
+  "mainPath": [
+    "intake",
+    "investigate",
+    "contract",
+    "eligible",
+    "claim",
+    "context",
+    "implement",
+    "candidate",
+    "validate",
+    "review",
+    "merge",
+    "close"
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Entrada pronta para execução",
+      "items": [
+        "Contrato fixa revisão, escopo de escrita, invariantes, orçamento e aceitação.",
+        "Aprovação humana só quando há decisão pendente ou exigência da política.",
+        "Dependências e conflitos podem manter a tarefa elegível em espera."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Paralelismo e correções",
+      "items": [
+        "Tarefas independentes têm runs separados, cada um com concessão própria.",
+        "Reprovação retorna diagnóstico; tentativas preservam consumo acumulado.",
+        "Mudança de contrato ou base invalida evidências afetadas."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Entrega aceita",
+      "items": [
+        "Gate combina diff real, critérios, ambiente, testes e revisão exigida.",
+        "Integração é serial e revalida a combinação na base atual.",
+        "Memória normativa muda por revisão; telemetria nunca concede sucesso."
+      ]
+    }
+  ]
+}

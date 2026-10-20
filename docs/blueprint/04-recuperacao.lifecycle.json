@@ -1,0 +1,252 @@
+{
+  "schema_version": 3,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "04 · Estados e recuperação · ARQUITETURA PLANEJADA",
+    "output": "04-recuperacao.html",
+    "quality_profile": "showcase"
+  },
+  "mainPath": [
+    "queued",
+    "leased",
+    "running",
+    "checking",
+    "integrating",
+    "done"
+  ],
+  "states": [
+    {
+      "id": "queued",
+      "type": "start",
+      "label": "Pronta",
+      "sublabel": "Contrato aceito"
+    },
+    {
+      "id": "leased",
+      "type": "active",
+      "label": "Reservada",
+      "sublabel": "Lease e orçamento"
+    },
+    {
+      "id": "running",
+      "type": "active",
+      "label": "Execução",
+      "sublabel": "Run isolado"
+    },
+    {
+      "id": "checking",
+      "type": "decision",
+      "label": "Validação",
+      "sublabel": "Candidato exato"
+    },
+    {
+      "id": "integrating",
+      "type": "active",
+      "label": "Integrando",
+      "sublabel": "Fila protegida"
+    },
+    {
+      "id": "done",
+      "type": "success",
+      "label": "Concluída",
+      "sublabel": "Merge comprovado"
+    },
+    {
+      "id": "blocked",
+      "type": "waiting",
+      "label": "Aguardando",
+      "sublabel": "Condição explícita"
+    },
+    {
+      "id": "reconcile",
+      "type": "decision",
+      "label": "Reconciliando",
+      "sublabel": "Efeito ou run incerto"
+    },
+    {
+      "id": "rework",
+      "type": "active",
+      "label": "Ajustando",
+      "sublabel": "Limite de tentativas"
+    },
+    {
+      "id": "cancelled",
+      "type": "neutral",
+      "label": "Cancelada",
+      "sublabel": "Revogação e limpeza"
+    },
+    {
+      "id": "failed",
+      "type": "failure",
+      "label": "Falha final",
+      "sublabel": "Diagnóstico e dono"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "queued-leased",
+      "from": "queued",
+      "to": "leased",
+      "label": "claim OK",
+      "variant": "security"
+    },
+    {
+      "id": "leased-running",
+      "from": "leased",
+      "to": "running",
+      "label": "início",
+      "variant": "default"
+    },
+    {
+      "id": "running-checking",
+      "from": "running",
+      "to": "checking",
+      "label": "pronto",
+      "variant": "default"
+    },
+    {
+      "id": "checking-integrating",
+      "from": "checking",
+      "to": "integrating",
+      "label": "gates OK",
+      "variant": "security"
+    },
+    {
+      "id": "integrating-done",
+      "from": "integrating",
+      "to": "done",
+      "label": "merge OK",
+      "variant": "emphasis"
+    },
+    {
+      "id": "queued-blocked",
+      "from": "queued",
+      "to": "blocked",
+      "label": "aguarda",
+      "variant": "default"
+    },
+    {
+      "id": "blocked-queued",
+      "from": "blocked",
+      "to": "queued",
+      "label": "resolvida",
+      "variant": "default"
+    },
+    {
+      "id": "running-reconcile",
+      "from": "running",
+      "to": "reconcile",
+      "label": "lease ou falha",
+      "variant": "security"
+    },
+    {
+      "id": "integrating-reconcile",
+      "from": "integrating",
+      "to": "reconcile",
+      "label": "efeito incerto",
+      "variant": "security"
+    },
+    {
+      "id": "reconcile-queued",
+      "from": "reconcile",
+      "to": "queued",
+      "label": "seguro retomar",
+      "variant": "default"
+    },
+    {
+      "id": "reconcile-done",
+      "from": "reconcile",
+      "to": "done",
+      "label": "merge comprovado",
+      "variant": "security"
+    },
+    {
+      "id": "checking-rework",
+      "from": "checking",
+      "to": "rework",
+      "label": "reprovado",
+      "variant": "default"
+    },
+    {
+      "id": "rework-queued",
+      "from": "rework",
+      "to": "queued",
+      "label": "revisar e revalidar",
+      "variant": "default"
+    },
+    {
+      "id": "reconcile-blocked",
+      "from": "reconcile",
+      "to": "blocked",
+      "label": "falta evidência",
+      "variant": "default"
+    },
+    {
+      "id": "rework-failed",
+      "from": "rework",
+      "to": "failed",
+      "label": "limite atingido",
+      "variant": "security"
+    },
+    {
+      "id": "queued-cancelled",
+      "from": "queued",
+      "to": "cancelled",
+      "label": "cancelamento",
+      "variant": "default"
+    },
+    {
+      "id": "running-cancelled",
+      "from": "running",
+      "to": "cancelled",
+      "label": "revogar efeitos",
+      "variant": "security"
+    },
+    {
+      "id": "reconcile-failed",
+      "from": "reconcile",
+      "to": "failed",
+      "label": "irrecuperável",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Estados do plano, não da CLI atual",
+      "items": [
+        "Cada transição requer identidade, revisão e evento persistido.",
+        "Concluída requer evidência de integração; um veredito de LLM é proposta.",
+        "A fila de recuperação tem responsável e condição de retomada."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Falha e cancelamento",
+      "items": [
+        "Revogar concessões bloqueia efeitos; pode não parar um processo remoto.",
+        "Conciliar operação incerta antes de repetir, com a mesma identidade lógica.",
+        "Não renovar orçamento ao criar filho, reiniciar sessão ou tentar de novo."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Controle sobre a retomada",
+      "items": [
+        "Restaurar checkpoint não restaura uma permissão expirada.",
+        "Mudança de base exige nova validação do candidato afetado.",
+        "Recuperação nunca marca sucesso sem os mesmos gates exigidos."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Condições das transições principais",
+      "items": [
+        "Pronta → Reservada: claim atômico válido, com recursos e orçamento.",
+        "Reservada → Execução: ambiente preparado; Execução → Validação: candidato pronto.",
+        "Validação → Integrando: todos os gates exigidos válidos.",
+        "Integrando → Concluída: recibo comprova merge e gates do mesmo candidato."
+      ]
+    }
+  ]
+}

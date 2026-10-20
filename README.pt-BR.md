@@ -2,6 +2,10 @@
 
 Contratos portáteis e validação prévia para desenvolvimento assistido por IA.
 
+[Abrir a arquitetura operacional](docs/blueprint/index.html): cinco mapas
+interativos feitos com Archify e o plano de funcionamento, concorrência, memória,
+falhas e implementação. O runtime desenhado ainda é uma proposta.
+
 O objetivo é reutilizar tarefas, políticas, memória versionada e critérios de
 entrega entre projetos e ferramentas, com isolamento e verificação fora dos prompts.
 

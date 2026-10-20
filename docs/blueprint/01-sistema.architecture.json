@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "01 · Componentes e fronteiras · ARQUITETURA PLANEJADA",
+    "output": "01-sistema.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    {
+      "id": "people",
+      "type": "external",
+      "label": "Equipe humana",
+      "sublabel": "Três identidades próprias",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "USUÁRIOS"
+    },
+    {
+      "id": "entry",
+      "type": "frontend",
+      "label": "Entrada autenticada",
+      "sublabel": "CLI / IDE / painel",
+      "pos": [
+        340,
+        40
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "core",
+      "type": "backend",
+      "label": "Core de coordenação",
+      "sublabel": "Fila, leases e orçamento",
+      "pos": [
+        640,
+        40
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "engine",
+      "type": "backend",
+      "label": "Motor LangGraph",
+      "sublabel": "Etapas e fan-out limitado",
+      "pos": [
+        940,
+        40
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "packs",
+      "type": "database",
+      "label": "Pacotes versionados",
+      "sublabel": "Projeto, stack e regras",
+      "pos": [
+        340,
+        235
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "Estado oficial + outbox",
+      "pos": [
+        640,
+        235
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "memory",
+      "type": "security",
+      "label": "Contexto autorizado",
+      "sublabel": "Revisão, ACL e evidências",
+      "pos": [
+        940,
+        235
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "git",
+      "type": "database",
+      "label": "Git protegido",
+      "sublabel": "Código e conhecimento",
+      "pos": [
+        40,
+        445
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "integrate",
+      "type": "security",
+      "label": "Gateway de integração",
+      "sublabel": "Base atual + gates",
+      "pos": [
+        340,
+        445
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "verify",
+      "type": "security",
+      "label": "Validação e revisão",
+      "sublabel": "Recibos do candidato",
+      "pos": [
+        640,
+        445
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "runners",
+      "type": "backend",
+      "label": "Runners isolados",
+      "sublabel": "Adaptadores por capacidade",
+      "pos": [
+        940,
+        445
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    },
+    {
+      "id": "trace",
+      "type": "messagebus",
+      "label": "Telemetria opcional",
+      "sublabel": "Langfuse ou LangSmith",
+      "pos": [
+        640,
+        665
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "OPCIONAL"
+    },
+    {
+      "id": "effects",
+      "type": "security",
+      "label": "Gateway de efeitos",
+      "sublabel": "Permissão + segredo curto",
+      "pos": [
+        940,
+        665
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "PLANEJADO"
+    }
+  ],
+  "connections": [
+    {
+      "id": "people-entry",
+      "from": "people",
+      "to": "entry",
+      "label": "demanda",
+      "variant": "emphasis"
+    },
+    {
+      "id": "entry-core",
+      "from": "entry",
+      "to": "core",
+      "label": "contrato",
+      "variant": "emphasis"
+    },
+    {
+      "id": "core-engine",
+      "from": "core",
+      "to": "engine",
+      "label": "concessão",
+      "variant": "security"
+    },
+    {
+      "id": "packs-entry",
+      "from": "packs",
+      "to": "entry",
+      "label": "release"
+    },
+    {
+      "id": "core-db",
+      "from": "core",
+      "to": "postgres",
+      "label": "transação"
+    },
+    {
+      "id": "engine-memory",
+      "from": "engine",
+      "to": "memory",
+      "label": "consulta ACL",
+      "variant": "security"
+    },
+    {
+      "id": "db-memory",
+      "from": "postgres",
+      "to": "memory",
+      "label": "visão aceita"
+    },
+    {
+      "id": "memory-runners",
+      "from": "memory",
+      "to": "runners",
+      "label": "manifesto",
+      "variant": "security"
+    },
+    {
+      "id": "runner-verify",
+      "from": "runners",
+      "to": "verify",
+      "label": "candidato",
+      "variant": "emphasis"
+    },
+    {
+      "id": "verify-integrate",
+      "from": "verify",
+      "to": "integrate",
+      "label": "recibos",
+      "variant": "security"
+    },
+    {
+      "id": "integrate-git",
+      "from": "integrate",
+      "to": "git",
+      "label": "merge válido",
+      "variant": "security"
+    },
+    {
+      "id": "runner-effects",
+      "from": "runners",
+      "to": "effects",
+      "label": "ação limitada",
+      "variant": "security"
+    },
+    {
+      "id": "verify-trace",
+      "from": "verify",
+      "to": "trace",
+      "label": "eventos limpos",
+      "variant": "dashed"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "Execução candidata · acesso restrito",
+      "wraps": [
+        "runners"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "security-group",
+      "label": "Aceitação protegida · autoridade separada",
+      "wraps": [
+        "verify",
+        "integrate"
+      ],
+      "pad": 20
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Estado real hoje",
+      "items": [
+        "Existe apenas o validador local de contratos JSON v1, com testes e CI.",
+        "Todos os serviços e controles deste mapa são metas de implementação.",
+        "Nós representam responsabilidades; não exigem um microserviço por caixa."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Quem decide",
+      "items": [
+        "O LLM propõe; o core concede recursos e aceita transições.",
+        "LangGraph mantém progresso; checkpoints não renovam permissões.",
+        "A fila usa dependências, prioridade, capacidade e exclusão atômica."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Memória e persistência",
+      "items": [
+        "PostgreSQL guarda tarefas, decisões aceitas e eventos duráveis.",
+        "Checkpoints, índices e observações têm papéis e permissões distintos.",
+        "Git e artefatos imutáveis preservam fontes, candidatos e recibos."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Execução e integrações",
+      "items": [
+        "Cada run tem workspace, processo, rede e credenciais limitados.",
+        "Codex, Claude, Cursor, Gemini e outros exigem adaptadores testados.",
+        "Deep Agents é executor opcional; MCP/A2A são transportes."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Escala e ferramentas opcionais",
+      "items": [
+        "Três funcionários mantêm identidades próprias; contas não são um pool de tokens.",
+        "MongoDB, BM25, ONNX, reranker e outras engines entram por evidência.",
+        "O diagrama não representa implantação existente nem segurança comprovada."
+      ]
+    }
+  ]
+}
