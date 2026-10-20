@@ -11,8 +11,12 @@ entrega entre projetos e ferramentas, com isolamento e verificação fora dos pr
 
 ## Estado atual
 
-Este primeiro protótipo contém contratos JSON, um validador executável, exemplos e
-testes. Ainda não executa agentes, não oferece sandbox, servidor de tarefas, RAG ou
+O projeto contém contratos JSON, um validador executável, exemplos e testes.
+O [coordenador M1 opcional](docs/m1-coordination.md) implementa API local autenticada,
+estado em PostgreSQL, reservas exclusivas, leases/fencing, orçamento cumulativo e
+outbox transacional. Consulte o guia para instalar, executar e conhecer os limites.
+
+Ainda não executa agentes, não oferece sandbox, RAG ou
 integrações com fornecedores. As declarações de capacidade são verificadas quanto
 à consistência; seu cumprimento real ainda depende de testes futuros dos runners.
 

@@ -1,0 +1,9 @@
+{
+  "protocol": "m1",
+  "project_id": "demo",
+  "resources": ["path:src/", "named:test-db"],
+  "max_active_runs": 3,
+  "budget_limit": 100,
+  "max_lease_seconds": 60,
+  "max_run_seconds": 3600
+}

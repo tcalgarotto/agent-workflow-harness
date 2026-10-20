@@ -1,6 +1,6 @@
 # Scope and current guarantees
 
-The current executable validates local JSON documents and their declared
+The `awh` executable validates local JSON documents and their declared
 relationships. It performs no model, subprocess, Git, network, database, or
 credential operations. CLI paths are supplied by the caller; the validator is not
 a file access authorization service.
@@ -18,6 +18,15 @@ not proof the gate ran or that its result was accepted.
 The Python validator loads packaged schemas without external references. Input
 documents are limited to 1 MB and duplicate JSON keys/non-finite numbers are
 rejected. The local CLI is not designed as an unauthenticated remote service.
+
+The optional `awh-coordinator` implements the [M1 boundary](m1-coordination.md):
+authenticated loopback API, PostgreSQL state, atomic project-local reservations,
+database-clock leases and fencing, cumulative operation-unit budgets, revision
+checks and transactional outbox. It uses network/database operations explicitly.
+Controller decisions are attestations, not verified evidence. The API does not
+execute agents, stop processes, enforce filesystem permissions, intercept model
+calls or provide a shared-effect gateway. Stale grants are rejected by M1
+mutations, not by external systems that have not yet integrated enforcement.
 
 No vendor integration has been certified. No deployment, retrieval quality, or
 hallucination-rate guarantee is provided.

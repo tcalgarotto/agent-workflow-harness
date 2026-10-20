@@ -15,12 +15,17 @@ contracts when changing projects, models, or agent tools.
 ## Status: early prototype
 
 **Implemented:** JSON Schemas, a local validation CLI, cross-contract checks, an
-example bundle, and automated tests.
+example bundle, and automated tests. The optional [M1 coordinator](docs/m1-coordination.md)
+adds a loopback authenticated API, PostgreSQL task state, atomic logical resource
+claims, leases/fencing, cumulative operation budgets and transactional outbox.
 
-**Not implemented:** a task server, transactional leases, agent execution,
+**Not implemented:** agent execution,
 filesystem sandboxing, a LangGraph runtime, RAG, MCP endpoints, provider adapters,
 or a merge gateway. Validating a declaration does not prove that a runner enforces
 it. This is not production security software and does not promise zero hallucinations.
+
+M1 records trusted controller decisions; it does not validate submitted evidence
+or stop worker processes. See its [operational limits and setup](docs/m1-coordination.md).
 
 ## Try the validator
 

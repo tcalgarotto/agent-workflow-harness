@@ -1,0 +1,15 @@
+{
+  "operation": "submit",
+  "command_id": "demo-submit-0001",
+  "task": {
+    "protocol": "m1",
+    "task_id": "implement-api",
+    "objective": "Prepare a candidate for the accepted API contract",
+    "acceptance_criteria": ["API behavior matches the accepted contract"],
+    "resources": ["path:src/api/", "named:test-db"],
+    "dependencies": [],
+    "required_capabilities": ["python"],
+    "priority": 50,
+    "budget_limit": 20
+  }
+}
