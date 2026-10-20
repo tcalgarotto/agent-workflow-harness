@@ -1,0 +1,22 @@
+{
+  "version": "m2a",
+  "image": "python:3.14-slim-bookworm@sha256:48b13b003dda20b16f9442b8475aa05fe21bf6579a8c881db92ffb4d8fd20f83",
+  "worker_command": [
+    "/usr/local/bin/python",
+    "-I",
+    "-c",
+    "from pathlib import Path; Path('src/api/result.txt').write_text('ready')"
+  ],
+  "validator_command": [
+    "/usr/local/bin/python",
+    "-I",
+    "-c",
+    "from pathlib import Path; assert Path('src/api/result.txt').read_text() == 'ready'"
+  ],
+  "timeout_seconds": 10,
+  "memory_mb": 128,
+  "pids": 32,
+  "cpu_millis": 500,
+  "workspace_mb": 16,
+  "output_bytes": 65536
+}

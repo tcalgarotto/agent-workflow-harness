@@ -28,7 +28,8 @@ open; this milestone group is not complete end-to-end.
 
 ## Controlled execution
 
-- [ ] Isolated executor and trusted validation runner.
+- [x] M2a Linux/Docker command executor and separate content-bound validation runner.
+- [x] M2a real containment, cancellation/recovery and authenticated receipt tests.
 - [ ] Revision-bound evidence and protected integration gateway.
 - [ ] One real adapter passing conformance tests.
 - [ ] Task-specific completeness checks and isolation of hidden build/test state.

@@ -53,28 +53,30 @@ class Store:
             conn.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
             yield conn
 
+    def _migrations(self):
+        return [(n, files(__package__).joinpath("migrations", f"{n:03d}.sql").read_text()) for n in (1, 2)]
+
     def migrate(self):
-        source = files(__package__).joinpath("migrations", "001.sql").read_text()
-        checksum = hashlib.sha256(source.encode()).hexdigest()
         with self.connection() as c:
             c.execute("SELECT pg_advisory_xact_lock(74201901)")
             c.execute("CREATE SCHEMA IF NOT EXISTS awh_m1")
             c.execute("CREATE TABLE IF NOT EXISTS awh_m1.schema_version "
                       "(version integer PRIMARY KEY, checksum text NOT NULL)")
-            rows = c.execute("SELECT * FROM awh_m1.schema_version").fetchall()
-            if rows:
-                if rows != [{"version": 1, "checksum": checksum}]:
-                    raise Rejected("migration_version_or_checksum_mismatch")
-            else:
+            rows = c.execute("SELECT * FROM awh_m1.schema_version ORDER BY version").fetchall()
+            migrations = self._migrations()
+            expected = [{"version": n, "checksum": hashlib.sha256(source.encode()).hexdigest()}
+                        for n, source in migrations]
+            if rows != expected[:len(rows)]:
+                raise Rejected("migration_version_or_checksum_mismatch")
+            for (n, source), row in zip(migrations[len(rows):], expected[len(rows):]):
                 c.execute(source)
-                c.execute("INSERT INTO awh_m1.schema_version VALUES (1,%s)", (checksum,))
+                c.execute("INSERT INTO awh_m1.schema_version VALUES (%s,%s)", (n, row["checksum"]))
 
     def verify_schema(self):
-        source = files(__package__).joinpath("migrations", "001.sql").read_text()
-        checksum = hashlib.sha256(source.encode()).hexdigest()
+        expected = [{"version": n, "checksum": hashlib.sha256(source.encode()).hexdigest()}
+                    for n, source in self._migrations()]
         with self.connection() as c:
-            if c.execute("SELECT * FROM awh_m1.schema_version").fetchall() != [
-                    {"version": 1, "checksum": checksum}]:
+            if c.execute("SELECT * FROM awh_m1.schema_version ORDER BY version").fetchall() != expected:
                 raise Rejected("migration_version_or_checksum_mismatch")
 
     def _event(self, c, pid, actor, kind, payload):
@@ -131,8 +133,10 @@ class Store:
 
     def execute(self, principal, pid, command):
         worker_ops = {"claim", "heartbeat", "charge", "finish"}
-        role = "worker" if command.operation in worker_ops else "controller"
-        authorize(principal, pid, {role})
+        roles = {"worker", "supervisor"} if command.operation in worker_ops else {"controller"}
+        if command.operation in {"start_execution", "end_execution"}:
+            roles = {"supervisor"}
+        authorize(principal, pid, roles)
         request = command.model_dump()
         request_hash = digest(request)
         with self.connection() as c:
@@ -203,10 +207,16 @@ class Store:
             return self._task(c, pid, doc["task_id"])
         if op == "claim":
             return self._claim(c, project, principal, cmd)
+        if op in {"start_execution", "end_execution"}:
+            return self._execution(c, principal, pid, cmd)
         if op in {"heartbeat", "charge", "finish", "reconcile"}:
             run = self._run(c, pid, cmd.run_id)
             if run["fence"] != cmd.fencing_token:
                 raise Rejected("stale_fencing_token")
+            if op in {"finish", "reconcile"} and c.execute(
+                    "SELECT 1 FROM awh_m1.executions WHERE project_id=%s AND run_id=%s AND state='admitted'",
+                    (pid, cmd.run_id)).fetchone():
+                raise Rejected("execution_stop_not_confirmed")
             if op == "reconcile":
                 if run["state"] not in {"expired", "revoked"}:
                     raise Rejected("run_does_not_require_reconciliation")
@@ -274,6 +284,54 @@ class Store:
     def _lease_limit(self, project, cmd):
         if cmd.lease_seconds > project["document"]["max_lease_seconds"]:
             raise Rejected("lease_exceeds_project_limit")
+
+    def _execution(self, c, principal, pid, cmd):
+        run = self._run(c, pid, cmd.run_id)
+        if run["fence"] != cmd.fencing_token or run["owner"] != principal.subject:
+            raise Rejected("execution_owner_or_fence_mismatch", 403)
+        if cmd.operation == "start_execution":
+            self._authority(c, principal, run)
+            if c.execute("SELECT 1 FROM awh_m1.executions WHERE project_id=%s AND "
+                         "(execution_id=%s OR (run_id=%s AND state='admitted'))",
+                         (pid, cmd.execution_id, cmd.run_id)).fetchone():
+                raise Rejected("execution_already_admitted")
+            if run["spent"] + 2 > run["allocated"]:
+                raise Rejected("allocation_exhausted")
+            self._move_budget(c, pid, run["task_id"], 2, -2)
+            c.execute("UPDATE awh_m1.runs SET spent=spent+2 WHERE project_id=%s AND run_id=%s",
+                      (pid, cmd.run_id))
+            self._ledger(c, principal, cmd, run, "charge", 2)
+            c.execute("INSERT INTO awh_m1.executions(project_id,execution_id,run_id,manifest_hash,owner,state) "
+                      "VALUES (%s,%s,%s,%s,%s,'admitted')",
+                      (pid, cmd.execution_id, cmd.run_id, cmd.manifest_hash, principal.subject))
+        else:
+            row = c.execute("SELECT * FROM awh_m1.executions WHERE project_id=%s AND execution_id=%s",
+                            (pid, cmd.execution_id)).fetchone()
+            if not row or row["run_id"] != cmd.run_id or row["state"] != "admitted":
+                raise Rejected("execution_not_admitted")
+            if not cmd.stopped_confirmed:
+                raise Rejected("execution_stop_not_confirmed")
+            if cmd.outcome == "validated":
+                self._authority(c, principal, run)
+                if not cmd.receipt_hash:
+                    raise Rejected("validated_receipt_required")
+            c.execute("UPDATE awh_m1.executions SET state='stopped',outcome=%s,receipt_hash=%s,"
+                      "stopped_at=clock_timestamp() WHERE project_id=%s AND execution_id=%s",
+                      (cmd.outcome, cmd.receipt_hash, pid, cmd.execution_id))
+        return c.execute("SELECT * FROM awh_m1.executions WHERE project_id=%s AND execution_id=%s",
+                         (pid, cmd.execution_id)).fetchone()
+
+    def execution_authority(self, principal, pid, execution_id):
+        authorize(principal, pid, {"supervisor"})
+        with self.connection() as c:
+            self._project(c, pid)
+            row = c.execute("SELECT * FROM awh_m1.executions WHERE project_id=%s AND execution_id=%s",
+                            (pid, execution_id)).fetchone()
+            if not row or row["state"] != "admitted" or row["owner"] != principal.subject:
+                raise Rejected("execution_not_admitted", 403)
+            run = self._run(c, pid, row["run_id"])
+            self._authority(c, principal, run)
+            return wire({"execution": row, "run": run, "task": self._task(c, pid, run["task_id"])})
 
     def _claim(self, c, project, principal, cmd):
         pid = project["project_id"]
@@ -364,6 +422,11 @@ class Store:
             elif kind == "run":
                 value = self._run(c, pid, identifier)
                 value["lease_current"] = value["state"] == "active" and value["lease_until"] > self._clock(c)
+            elif kind == "execution":
+                value = c.execute("SELECT * FROM awh_m1.executions WHERE project_id=%s AND execution_id=%s",
+                                  (pid, identifier)).fetchone()
+                if not value:
+                    raise Rejected("execution_not_found", 404)
             elif kind == "tasks":
                 value = c.execute("SELECT * FROM awh_m1.tasks WHERE project_id=%s AND task_id>%s "
                                   "ORDER BY task_id LIMIT %s", (pid, after_task, limit)).fetchall()

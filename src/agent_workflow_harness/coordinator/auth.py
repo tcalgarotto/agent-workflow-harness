@@ -23,7 +23,7 @@ class Principal:
 
 class Credential(Model):
     subject: Identifier
-    role: Literal["controller", "worker", "reader"]
+    role: Literal["controller", "worker", "reader", "supervisor"]
     projects: list[Identifier] = Field(min_length=1, max_length=100)
     capabilities: list[Identifier] = Field(max_length=64)
     token_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")

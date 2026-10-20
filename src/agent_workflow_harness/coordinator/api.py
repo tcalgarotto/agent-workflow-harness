@@ -101,4 +101,13 @@ def create_app(store, auth):
                limit: int = Query(100, ge=1, le=1000), principal=Depends(identity)):
         return store.read(principal, project_id, "events", after=after, limit=limit)
 
+    @app.get("/v1/projects/{project_id}/executions/{execution_id}/authority")
+    def execution_authority(project_id: Identifier, execution_id: str, principal=Depends(identity)):
+        # Fresh check; never serve a cached/idempotency receipt as current authority.
+        return store.execution_authority(principal, project_id, execution_id)
+
+    @app.get("/v1/projects/{project_id}/executions/{execution_id}")
+    def execution_get(project_id: Identifier, execution_id: str, principal=Depends(identity)):
+        return store.read(principal, project_id, "execution", execution_id)
+
     return app

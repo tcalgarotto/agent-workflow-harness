@@ -2,7 +2,9 @@
 
 This describes the intended end-to-end runtime. The project implements static
 contract validation and the optional [M1 coordinator](m1-coordination.md).
-Agent execution, sandboxing, retrieval and protected integration remain planned.
+The optional [M2a supervisor](m2a-supervisor.md) implements bounded Linux/Docker
+command execution and authenticated content-bound validation receipts.
+AI runner integration, retrieval and protected Git integration remain planned.
 
 Start with the [operational blueprint and interactive maps](blueprint/index.html)
 for the end-to-end plan, three-worker example, recovery paths and implementation

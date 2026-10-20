@@ -143,6 +143,21 @@ class Sweep(Command):
     operation: Literal["sweep"]
 
 
+class StartExecution(RunCommand):
+    operation: Literal["start_execution"]
+    execution_id: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{32}$")]
+    manifest_hash: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
+
+
+class EndExecution(RunCommand):
+    operation: Literal["end_execution"]
+    execution_id: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{32}$")]
+    stopped_confirmed: bool
+    outcome: Literal["validated", "failed", "cancelled", "timed_out", "authority_lost", "recovered"]
+    receipt_hash: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")] | None = None
+
+
 CommandBody = Annotated[Union[Submit, Accept, Revise, Cancel, Decide, Claim,
-                             Heartbeat, Charge, Finish, Reconcile, Sweep],
+                             Heartbeat, Charge, Finish, Reconcile, Sweep,
+                             StartExecution, EndExecution],
                         Field(discriminator="operation")]

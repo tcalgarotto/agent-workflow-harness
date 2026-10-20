@@ -5,6 +5,10 @@ temporária, reserva recursos e orçamento e mantém eventos na mesma transaçã
 Ainda não executa agentes, comandos, Git, testes candidatos ou efeitos externos.
 O validador estático v1 continua independente; `protocol: "m1"` é outro contrato.
 
+Extensão atual: o [supervisor M2a](m2a-supervisor.md) usa esta API para executar
+comandos em contêineres próprios e registrar parada/recibos. Atualize a API com a
+migração 002 antes de habilitá-lo; o schema 001 e os contratos v1 não são alterados.
+
 ## Executar
 
 Instale a partir do checkout, com Python 3.11 ou superior:
@@ -25,7 +29,8 @@ Migrações são explícitas, transacionais e verificam versão e checksum:
 
 Crie fora do repositório um arquivo JSON de credenciais, com permissão `0600`.
 Cada entrada contém `subject`, `role`, `projects`, `capabilities` e
-`token_sha256`. Os papéis disponíveis são `controller`, `worker` e `reader`.
+`token_sha256`. Os papéis básicos são `controller`, `worker` e `reader`; o
+[M2a](m2a-supervisor.md) acrescenta `supervisor` para o serviço de execução confiável.
 Gere um token aleatório independente por identidade, com pelo menos 32 bytes
 aleatórios, usando seu gerenciador de segredos ou `secrets.token_urlsafe(32)`.
 Armazene no arquivo somente seu digest hexadecimal SHA-256; entregue o token ao

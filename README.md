@@ -18,14 +18,19 @@ contracts when changing projects, models, or agent tools.
 example bundle, and automated tests. The optional [M1 coordinator](docs/m1-coordination.md)
 adds a loopback authenticated API, PostgreSQL task state, atomic logical resource
 claims, leases/fencing, cumulative operation budgets and transactional outbox.
+The optional [M2a supervisor](docs/m2a-supervisor.md) adds bounded Linux/Docker
+execution, per-run files, cancellation/recovery and authenticated receipts for
+an exact candidate validated in a separate read-only environment.
 
-**Not implemented:** agent execution,
-filesystem sandboxing, a LangGraph runtime, RAG, MCP endpoints, provider adapters,
+**Not implemented:** AI agent/provider execution,
+a LangGraph runtime, RAG, MCP endpoints, provider adapters,
 or a merge gateway. Validating a declaration does not prove that a runner enforces
 it. This is not production security software and does not promise zero hallucinations.
 
-M1 records trusted controller decisions; it does not validate submitted evidence
-or stop worker processes. See its [operational limits and setup](docs/m1-coordination.md).
+M1 records trusted controller decisions; M2a supervises its own containers and
+binds validation results to content. The first supported execution profile uses
+a trusted rootful Docker daemon and non-root candidate processes, not rootless
+Docker or production isolation certification. See the [M2a limits and setup](docs/m2a-supervisor.md).
 
 ## Try the validator
 
