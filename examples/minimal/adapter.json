@@ -1,0 +1,17 @@
+{
+  "schema_version": "1",
+  "project_id": "sample-project",
+  "adapter_id": "example-runner",
+  "runner": "declarative-example-not-a-real-adapter",
+  "adapter_version": "0.1.0",
+  "enforcement_level": "delivery",
+  "capabilities": [
+    "structured-output",
+    "workspace-editing"
+  ],
+  "tools": [
+    "read-files",
+    "write-files",
+    "run-tests"
+  ]
+}

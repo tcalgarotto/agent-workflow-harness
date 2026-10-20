@@ -1,0 +1,16 @@
+name: Feature proposal
+description: Propose a bounded change with observable acceptance criteria
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and scope
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and validation
+      description: Explain what evidence would show the feature works.
+    validations:
+      required: true

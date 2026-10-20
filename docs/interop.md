@@ -1,0 +1,32 @@
+# Interoperability and conformance
+
+Models, runners, IDEs, and accounts are different resources. Compatibility belongs
+to a runner/version/provider/configuration combination, not a brand name.
+
+Use a short AGENTS.md entry point where supported. Generate or reference native
+instruction surfaces only where the selected runner supports them. Cursor rules,
+Claude Code instructions, Gemini CLI context, and Codex instructions do not imply
+identical hooks or enforcement guarantees. Procedure packs may use Agent Skills
+for compatible consumers. MCP can expose tools but does not provide the business
+authorization, sandbox, or scheduler by itself.
+
+Proposed adapter operations: describe capabilities, prepare, start/resume, stream
+events, request cancellation, collect delivery, and report health. Declare whether
+cancellation is confirmed or best-effort; revoking shared-effect authority is a
+separate operation.
+
+Conformance must test schema output, effective policy versions, cross-project
+access, file isolation, expired reservations, recovery, review separation, and
+truthful capability reporting. A model-generated assertion is not a certificate.
+
+Codex, Cursor, Claude, Gemini, Grok, Mistral, and Qwen are possible integration
+targets. No adapters for them are implemented or certified here. The example
+runner is intentionally synthetic. Do not copy personal login caches, pool
+accounts, or assume subscription access is a generic API credential.
+
+References: [AGENTS.md](https://agents.md/),
+[Agent Skills](https://agentskills.io/specification),
+[MCP](https://modelcontextprotocol.io/specification/2026-07-28),
+[Cursor rules](https://cursor.com/docs/rules),
+[Claude Code memory](https://code.claude.com/docs/en/memory), and
+[Gemini CLI context](https://geminicli.com/docs/cli/gemini-md/).

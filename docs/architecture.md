@@ -1,0 +1,52 @@
+# Target architecture
+
+This describes the intended runtime. The current release only validates contracts.
+
+## Reusable layers
+
+1. Core: task state, authorization, resource reservations, events, and evidence.
+2. Project pack: domain, accepted requirements, decisions, contracts, and ownership.
+3. Stack profile: runtime, tools, test commands, and compatibility constraints.
+4. Procedure pack: investigation, implementation, review, and recovery workflows.
+5. Executor adapter: a particular runner/version/provider combination.
+
+Workflow engines and observability exporters sit behind interfaces. LangGraph can
+provide durable orchestration, Langfuse can receive instrumented traces, and
+LangChain can supply retrieval/tool components. None is the authority for all
+project data. See interop.md and memory.md.
+
+## Authorities
+
+- Accepted requirements, decisions, and code: versioned Git revisions.
+- Task state, leases, resource locks, and accepted deliveries: coordination service.
+- Working change: isolated run and candidate revision.
+- Retrieval indexes: rebuildable projections of authorized source revisions.
+- Telemetry: observations, not permission to act or proof of task completion.
+
+## Execution path
+
+Intake -> investigate -> task contract -> deterministic eligibility -> atomic
+reservation -> isolated run -> trusted validation -> independent review where
+required -> protected integration -> knowledge update -> reconciliation.
+
+The scheduler grants resources; an LLM may propose a plan but cannot grant its
+own permissions. Lease renewal and monotonic fencing tokens must protect every
+shared-effect gateway. Expiration does not terminate a disconnected process.
+Recovery must reconcile ambiguous effects before retrying them.
+
+Code, acceptance criteria, policy, and validation receipts must be bound to exact
+revisions. Updating a graph checkpoint does not atomically update an external
+service. Use transactions, idempotency, durable events, and reconciliation at the
+appropriate boundaries.
+
+## Change discipline
+
+Use proportional tracks: lightweight documentation checks; standard behavior
+tests and review; higher scrutiny for authorization, persistent data, and shared
+contracts. An executor cannot waive its own required gates or silently expand
+scope. Small tasks should not incur artificial paperwork or meaningless tests.
+
+Start with one trusted local coordinator. Add multi-host PostgreSQL coordination
+only after race, recovery, and isolation tests. Worktrees organize files but are
+not security sandboxes. A controlled runner needs real OS/container permissions
+and scoped credentials, without host-level escape hatches.

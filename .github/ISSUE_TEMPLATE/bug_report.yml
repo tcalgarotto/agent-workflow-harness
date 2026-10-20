@@ -1,0 +1,16 @@
+name: Bug report
+description: Report a reproducible behavior or contract validation problem
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include versions and a minimal synthetic input. Never include secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true

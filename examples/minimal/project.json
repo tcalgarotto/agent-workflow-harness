@@ -1,0 +1,8 @@
+{
+  "schema_version": "1",
+  "project_id": "sample-project",
+  "policy_id": "development-policy",
+  "workflow_id": "assisted-development",
+  "max_active_runs": 3,
+  "minimum_enforcement": "delivery"
+}

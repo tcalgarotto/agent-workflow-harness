@@ -1,0 +1,25 @@
+{
+  "schema_version": "1",
+  "project_id": "sample-project",
+  "task_id": "improve-parser",
+  "workflow_id": "assisted-development",
+  "adapter_id": "example-runner",
+  "objective": "Handle an invalid input without changing the public contract.",
+  "acceptance_criteria": [
+    "Invalid input produces a documented error.",
+    "Existing valid inputs retain their behavior."
+  ],
+  "allowed_paths": [
+    "src/parser.py",
+    "tests/"
+  ],
+  "tools": [
+    "read-files",
+    "write-files",
+    "run-tests"
+  ],
+  "required_capabilities": [
+    "structured-output"
+  ],
+  "max_tool_calls": 20
+}

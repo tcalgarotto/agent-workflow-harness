@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent Workflow Harness: policy",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$"
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$"
+    },
+    "max_active_runs": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "minimum_enforcement": {
+      "enum": [
+        "advised",
+        "delivery",
+        "execution"
+      ]
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]{0,63}$"
+      },
+      "uniqueItems": true,
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "writable_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "uniqueItems": true,
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "protected_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "uniqueItems": true,
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "max_tool_calls": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "required_gates": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "validate",
+          "review"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1,
+      "maxItems": 1000
+    }
+  },
+  "required": [
+    "schema_version",
+    "project_id",
+    "policy_id",
+    "max_active_runs",
+    "minimum_enforcement",
+    "allowed_tools",
+    "writable_paths",
+    "protected_paths",
+    "max_tool_calls",
+    "required_gates"
+  ],
+  "additionalProperties": false
+}
