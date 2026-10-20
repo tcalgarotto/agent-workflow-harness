@@ -13,7 +13,10 @@ This is a sequence of evidence-based milestones, not a delivery-date promise.
 
 - [ ] Authenticated service boundary and durable task state machine.
 - [ ] Atomic claims, resource conflicts, lease renewal and fencing.
+- [ ] PostgreSQL-first persistent coordinator with tested isolation and resource-overlap admission.
 - [ ] Concurrency, expiration, crash, and reconciliation tests.
+- [ ] Evidence-bound intended behavior and revalidation of mutable preconditions.
+- [ ] Delegation lineage, bounded task mailboxes, and cumulative budgets across resume.
 
 Exit: two workers cannot obtain incompatible active authority; stale tokens cannot
 produce shared effects. A database row alone is insufficient.
@@ -23,21 +26,40 @@ produce shared effects. A database row alone is insufficient.
 - [ ] Isolated executor and trusted validation runner.
 - [ ] Revision-bound evidence and protected integration gateway.
 - [ ] One real adapter passing conformance tests.
+- [ ] Task-specific completeness checks and isolation of hidden build/test state.
 
 Exit: cross-workspace writes fail and changes after verification invalidate receipts.
 
 ## Portable workflows and memory
 
 - [ ] Persistent workflow engine adapter and event reconciliation.
+- [ ] LangGraph-first experiment with persistent checkpoints, crash/replay tests and bounded fan-out.
 - [ ] Knowledge proposals, immutable source revisions, and context manifests.
+- [ ] Task-scoped memory with revision conflicts, curated journals, and explicit promotion.
 - [ ] Exact/lexical retrieval baseline before vector/BM25/reranker experiments.
+- [ ] Source/index generation, revocation and filtered-recall tests before a second retrieval backend.
 - [ ] Instrumented observability and held-out evaluations.
+- [ ] Opt-in sanitized exporter; evaluate LangSmith against the existing Langfuse candidate.
+- [ ] Versioned tool fixtures and action/outcome evaluation before provider tuning.
 
 ## Reuse and remote execution
 
 - [ ] Pilot in two unrelated projects and two different runners.
+- [ ] Native delegation, goal, memory, and team conformance where supported.
 - [ ] PostgreSQL multi-host coordination and worker pool conformance.
 - [ ] Backup/restore tests and versioned upgrade guidance.
+- [ ] Capacity benchmarks for worker pools, nested builds, and validation queues.
 
 Do not advertise universal agent compatibility or production isolation before the
 corresponding tests and implementations exist.
+
+The [evaluation proposal](evaluation.md) adds acceptance scenarios; they are not
+implemented tests yet. Compare optional engine/provider adapters only after the
+common controls have evidence. See [ADR 0002](decisions/0002-evidence-grounding-and-evaluation.md).
+The [team and memory proposal](decisions/0003-portable-task-memory-and-development-teams.md)
+adds portability and recovery acceptance criteria without implementing them yet.
+The [LangChain integration proposal](langchain-integration.md) assigns ecosystem
+components specific jobs and adds engine/memory/export acceptance criteria. It
+does not add dependencies or require managed hosting.
+The [storage proposal](storage-and-retrieval.md) specifies the initial backend
+candidate and promotion criteria, without claiming a cross-database benchmark.

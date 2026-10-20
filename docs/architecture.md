@@ -2,6 +2,11 @@
 
 This describes the intended runtime. The current release only validates contracts.
 
+Start with the [operational blueprint and interactive maps](blueprint/index.html)
+for the end-to-end plan, three-worker example, recovery paths and implementation
+milestones. Its [Portuguese source](blueprint/README.pt-BR.md) distinguishes the
+existing validator from proposed services and controls.
+
 ## Reusable layers
 
 1. Core: task state, authorization, resource reservations, events, and evidence.
@@ -14,6 +19,17 @@ Workflow engines and observability exporters sit behind interfaces. LangGraph ca
 provide durable orchestration, Langfuse can receive instrumented traces, and
 LangChain can supply retrieval/tool components. None is the authority for all
 project data. See interop.md and memory.md.
+
+The [LangChain integration proposal](langchain-integration.md) prioritizes LangGraph
+for the first engine experiment, selected LangChain components, optional Deep
+Agents workers, and a replaceable telemetry exporter. See
+[ADR 0004](decisions/0004-langgraph-first-engine-adapter.md). No library dependency
+or runtime capability is added by that proposal.
+
+The [storage proposal](storage-and-retrieval.md) prioritizes PostgreSQL for the
+first persistent coordinator and treats lexical/vector retrieval as replaceable
+projections. Database transactions, checkpoint storage and search freshness have
+separate semantics. See [ADR 0005](decisions/0005-postgresql-first-storage-and-retrieval.md).
 
 ## Authorities
 
@@ -38,6 +54,20 @@ Code, acceptance criteria, policy, and validation receipts must be bound to exac
 revisions. Updating a graph checkpoint does not atomically update an external
 service. Use transactions, idempotency, durable events, and reconciliation at the
 appropriate boundaries.
+
+Proposed extension: bind intended behavior to source evidence before mutation and
+revalidate mutable preconditions at the effect boundary. Add an evaluation plane
+that measures actions and outcomes independently of permission checks. See
+[ADR 0002](decisions/0002-evidence-grounding-and-evaluation.md) and
+[evaluation design](evaluation.md). These are target-runtime proposals, not
+additional guarantees of the current validator.
+
+Proposed collaboration layer: [development teams](development-teams.md) use a
+single task authority, bounded delegation, addressed messages, and controlled
+integration. [Task-scoped memory](task-memory.md) supplies accepted context,
+attributed observations, proposals, and reusable journals. Native team boards and
+goal verdicts do not become a second authority. See
+[ADR 0003](decisions/0003-portable-task-memory-and-development-teams.md).
 
 ## Change discipline
 

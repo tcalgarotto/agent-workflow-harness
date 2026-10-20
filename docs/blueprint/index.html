@@ -1,0 +1,659 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AWH · Arquitetura operacional planejada</title><style>*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f6f7f9;color:#172334;font:16px/1.65 system-ui,sans-serif}main{max-width:1120px;margin:auto;padding:36px 28px 80px}header{padding:28px 0 18px;border-bottom:1px solid #ccd5de;margin-bottom:28px}header h1{font-size:36px;line-height:1.15;margin:14px 0;max-width:850px}h2{margin-top:45px;font-size:24px}h3{font-size:20px}a{color:#09589e;text-underline-offset:3px}a:focus-visible{outline:3px solid #dc873a;outline-offset:4px}.status{display:inline-block;border:1px solid #bb6412;color:#894409;background:#fff6e8;padding:3px 10px;border-radius:5px;font-size:13px;font-weight:650}.intro{max-width:850px;color:#425367}.views{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:24px 0 36px}.view{display:block;border:1px solid #cad4df;background:#fff;border-radius:10px;padding:18px;text-decoration:none;color:inherit}.view strong{display:block;color:#09589e;font-size:18px}.view span{display:block;color:#526172;margin-top:7px;font-size:14px}.view:hover{border-color:#09589e;background:#f0f7ff}.quick{padding:22px;background:#e8eff6;border-left:4px solid #246e9f;border-radius:6px}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow:auto;margin:18px 0}td,th{text-align:left;vertical-align:top;padding:11px 14px;border:1px solid #ccd5df}th{background:#e7edf4}td{background:#fff}code{font:13px/1.5 ui-monospace,monospace;background:#e7edf4;padding:2px 4px;border-radius:3px}pre{max-width:100%;overflow:auto;padding:14px;background:#e7edf4;border-radius:6px}pre code{padding:0;background:none}p,li{max-width:1000px}footer{margin-top:48px;color:#526172;border-top:1px solid #ccd5df;padding-top:20px;font-size:13px}.tools{display:flex;flex-wrap:wrap;gap:18px;margin-top:16px}details{padding:12px;background:#fff;border:1px solid #cad4df;border-radius:6px}summary{cursor:pointer;font-weight:650}.article{border-top:1px solid #ccd5df;padding-top:14px}@media(max-width:650px){main{padding:22px 16px}header h1{font-size:28px}h2{font-size:22px}.views{grid-template-columns:1fr}td,th{min-width:135px}table{font-size:13px}}@media print{body{background:#fff}.view{break-inside:avoid}.tools{display:none}main{max-width:none;padding:0}h2{break-after:avoid}table{display:table;font-size:10px}td,th{padding:5px}a{color:inherit}}</style></head><body><main><header><span class="status">PROPOSTA · 20 OUT 2026 · RUNTIME AINDA NÃO IMPLEMENTADO</span><h1>Como o workflow vai funcionar na prática</h1><p class="intro">Um núcleo comum coordena tarefas, recursos e memória. Agentes trabalham em ambientes separados; a integração exige evidências válidas na base atual.</p><div class="tools"><a href="#guia">Ler o plano operacional</a><a href="README.pt-BR.md">Fonte em Markdown</a><a href="proveniencia.json">Proveniência</a></div></header><nav class="views" aria-label="Diagramas interativos"><a class="view" href="01-sistema.html"><strong>01 · Componentes e fronteiras</strong><span>Core, fila, LangGraph, runners, memória e integração.</span></a><a class="view" href="02-entrega.html"><strong>02 · Da demanda à entrega</strong><span>Contrato, preflight, reserva, execução, gates e fechamento.</span></a><a class="view" href="03-memoria.html"><strong>03 · Memória e RAG</strong><span>Fontes, propostas, decisões aceitas e contexto autorizado.</span></a><a class="view" href="04-recuperacao.html"><strong>04 · Falhas e recuperação</strong><span>Esperas, ajustes, reconciliação, cancelamento e retomada.</span></a><a class="view" href="05-tres-funcionarios.html"><strong>05 · Três funcionários em paralelo</strong><span>Contrato primeiro, API e UI isoladas, integração com nova base.</span></a></nav><section class="quick"><strong>Caminho principal</strong><p>Demanda → investigação → contrato aceito → claim atômico → run isolado → validação e revisão → integração protegida → memória atualizada.</p><p>Os mapas são documentação do plano. Atualmente o projeto oferece o validador local de contratos. Conteúdo dos mapas em português; controles fixos do Archify em inglês.</p></section><article class="article" id="guia"><h1 id="arquitetura-operacional-do-agent-workflow-harness">Arquitetura operacional do Agent Workflow Harness</h1>
+<p>Versão de projeto: 20/10/2026. Status: proposta para revisão, antes da implementação
+do runtime. A arquitetura consolida os estudos anteriores; não promete ausência
+de alucinações nem isolamento já implementado.</p>
+<p>O sistema recebe uma demanda, transforma seu objetivo em tarefas verificáveis,
+distribui trabalho compatível entre executores isolados e integra somente
+candidatos com evidências válidas. O núcleo mantém a autoridade sobre tarefas,
+recursos, orçamento e conhecimento aceito. Modelos propõem soluções dentro dela.</p>
+<p>Hoje existem contratos JSON v1, validador local, exemplos, testes e CI. Não existem
+os servidores, bancos, sandboxes ou adaptadores desenhados abaixo. Os contratos de
+execução descritos neste documento precisarão de uma versão própria; não são
+campos adicionais que a CLI v1 já aceite.</p>
+<h2 id="1-como-ler-os-mapas">1. Como ler os mapas</h2>
+<p>Os diagramas foram produzidos com Archify 3.2.0. São interativos, com fontes JSON
+editáveis. Conteúdo em português; os controles fixos do visualizador estão em
+inglês. Setas representam caminhos planejados, não tráfego observado. O exemplo
+com funcionários é ilustrativo e não apresenta durações medidas.</p>
+<table>
+<thead>
+<tr>
+<th>Vista</th>
+<th>Pergunta que responde</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01-sistema.html">Componentes</a></td>
+<td>Quem coordena, executa, guarda dados e aceita entregas?</td>
+</tr>
+<tr>
+<td><a href="02-entrega.html">Entrega</a></td>
+<td>Qual caminho uma demanda percorre até concluir?</td>
+</tr>
+<tr>
+<td><a href="03-memoria.html">Memória</a></td>
+<td>O que cada agente consulta e como o conhecimento muda?</td>
+</tr>
+<tr>
+<td><a href="04-recuperacao.html">Recuperação</a></td>
+<td>O que ocorre com falhas, esperas, retries e cancelamentos?</td>
+</tr>
+<tr>
+<td><a href="05-tres-funcionarios.html">Três funcionários</a></td>
+<td>Como distribuir uma feature e integrar mudanças concorrentes?</td>
+</tr>
+</tbody>
+</table>
+<p>As caixas são responsabilidades lógicas. O início será um monólito modular com
+processos de execução separados; não precisamos implantar um microserviço para
+cada caixa. Fronteiras de confiança continuam reais, mesmo com menos serviços.</p>
+<h2 id="2-composicao-inicial-e-pontos-substituiveis">2. Composição inicial e pontos substituíveis</h2>
+<table>
+<thead>
+<tr>
+<th>Peça</th>
+<th>Escolha planejada</th>
+<th>Responsabilidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Núcleo</td>
+<td>Serviço Python autenticado, com CLI cliente</td>
+<td>Transições, política efetiva, concessões e aceitação</td>
+</tr>
+<tr>
+<td>API</td>
+<td>HTTP/JSON tipado; framework web definido na implementação</td>
+<td>Interface única para CLI, IDE, painel e integrações</td>
+</tr>
+<tr>
+<td>Coordenação</td>
+<td>PostgreSQL, transações curtas e outbox</td>
+<td>Fila, recursos, leases, consumo e efeitos</td>
+</tr>
+<tr>
+<td>Engine</td>
+<td>Primeiro adaptador LangGraph</td>
+<td>Executar etapas, ramificar e retomar progresso</td>
+</tr>
+<tr>
+<td>Componentes de IA</td>
+<td>LangChain selecionado</td>
+<td>Modelos, ferramentas, saída estruturada e recuperação</td>
+</tr>
+<tr>
+<td>Workers</td>
+<td>Adaptadores de runners; Deep Agents opcional</td>
+<td>Executar cada tarefa dentro de capacidades verificadas</td>
+</tr>
+<tr>
+<td>Isolamento</td>
+<td>Supervisor Linux e containers sem root, sujeitos a teste</td>
+<td>Arquivos, processos, rede, credenciais e quotas</td>
+</tr>
+<tr>
+<td>Memória</td>
+<td>API autorizada sobre registros e fontes versionadas</td>
+<td>Separar aceito, observado, proposto e temporário</td>
+</tr>
+<tr>
+<td>Busca</td>
+<td>Exata e textual; pgvector após avaliação</td>
+<td>Descobrir fontes sem substituir sua autoridade</td>
+</tr>
+<tr>
+<td>Artefatos</td>
+<td>Armazenamento por hash, inicialmente local restrito</td>
+<td>Snapshots, diffs, saídas sanitizadas e recibos</td>
+</tr>
+<tr>
+<td>Integração</td>
+<td>Serviço separado com acesso ao Git protegido</td>
+<td>Verificar base, gates e registrar resultado do merge</td>
+</tr>
+<tr>
+<td>Telemetria</td>
+<td>Um exporter inicial, Langfuse ou LangSmith</td>
+<td>Traces e avaliação conforme política de dados</td>
+</tr>
+</tbody>
+</table>
+<p>MCP expõe ferramentas; A2A pode transportar comunicação. Nenhum protocolo fornece
+sozinho autorização, reservas ou sandbox. ADK fica como alternativa de engine;
+MongoDB como possível adaptador de recuperação. IBM inspira catálogos, releases,
+pools e recuperação, sem obrigar a contratar seu produto. Não executar dois
+schedulers independentes sobre as mesmas tarefas.</p>
+<h2 id="3-preparacao-de-um-projeto">3. Preparação de um projeto</h2>
+<ol>
+<li>Registrar <code>project_id</code>, repositório, responsáveis, classe de dados e ambientes.</li>
+<li>Criar o pacote de projeto: requisitos, decisões, contratos, mapa do código,
+   ownership, procedimentos e critérios de entrega. Material privado permanece
+   no escopo autorizado do projeto, fora do repositório público deste harness.</li>
+<li>Selecionar perfil de stack: ferramentas, comandos aceitos, dependências,
+   recursos compartilhados, política de rede e validações relevantes.</li>
+<li>Selecionar adaptadores e pools homologados. Registrar versões, ferramentas,
+   observabilidade de filhos, cancelamento, isolamento e limitações reais.</li>
+<li>Publicar uma release imutável do conjunto de workflow, regras, contratos,
+   perfis e procedimentos. Fixar essa release por execução.</li>
+<li>Indexar fontes permitidas com hashes e revisões, e executar o teste de entrada
+   do projeto antes de liberar trabalho com escrita.</li>
+</ol>
+<p>O relatório inicial de produto é uma entrada do pacote de domínio, com origem e
+revisão; não vira automaticamente política global. Reutilizar a arquitetura em
+outro projeto significa trocar o pacote de domínio, stack e conexões, mantendo
+o mesmo protocolo e os testes comuns de conformidade.</p>
+<h2 id="4-caminho-principal-demanda-ate-entrega">4. Caminho principal: demanda até entrega</h2>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Operação</th>
+<th>Evidência ou saída exigida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entrada</td>
+<td>Autenticar pessoa/integração, identificar projeto e mandato</td>
+<td>Demanda identificada, sem segredo no prompt</td>
+</tr>
+<tr>
+<td>Investigação</td>
+<td>Ler código, requisitos, decisões e estado externo relevante</td>
+<td>Fontes citadas, revisões e dúvidas explícitas</td>
+</tr>
+<tr>
+<td>Planejamento</td>
+<td>Agente propõe tarefas pequenas e dependências</td>
+<td>Objetivo, invariantes, recursos e critérios verificáveis</td>
+</tr>
+<tr>
+<td>Aceite do contrato</td>
+<td>Serviço valida; decisão humana somente se necessária</td>
+<td>Revisão aceita e política aplicável</td>
+</tr>
+<tr>
+<td>Preflight</td>
+<td>Conferir contratos, capacidade, ambiente, orçamento e gates disponíveis</td>
+<td>Resultado impeditivo ou elegibilidade</td>
+</tr>
+<tr>
+<td>Reserva</td>
+<td>Conceder tarefa e recursos em transação atômica</td>
+<td>Run, lease, fencing e orçamento reservado</td>
+</tr>
+<tr>
+<td>Preparação</td>
+<td>Criar snapshot/workspace e manifesto de contexto</td>
+<td>Base, release, hashes e ferramentas permitidas</td>
+</tr>
+<tr>
+<td>Execução</td>
+<td>Implementar, consultar memória, publicar observações e candidatos</td>
+<td>Commit/diff, artefatos e eventos atribuídos</td>
+</tr>
+<tr>
+<td>Validação</td>
+<td>Rodar verificações confiáveis no candidato imutável</td>
+<td>Recibo ligado ao código, ambiente e critérios</td>
+</tr>
+<tr>
+<td>Revisão</td>
+<td>Examinar intenção, completude, contratos e limites</td>
+<td>Parecer independente quando exigido</td>
+</tr>
+<tr>
+<td>Integração</td>
+<td>Verificar base atual e integrar combinação validada</td>
+<td>Identidade do efeito e recibo do Git</td>
+</tr>
+<tr>
+<td>Fechamento</td>
+<td>Aceitar entrega, liberar recursos e registrar aprendizado</td>
+<td>Estado final, links e proposta de conhecimento</td>
+</tr>
+</tbody>
+</table>
+<p>Documentação simples segue controles proporcionais. Mudanças de autorização,
+dados persistentes e contratos compartilhados exigem os gates correspondentes.
+Nenhum executor enfraquece seus próprios testes, escopo ou critérios para passar.</p>
+<h2 id="5-fila-dependencias-e-enxames">5. Fila, dependências e enxames</h2>
+<p>O PostgreSQL mantém a fila oficial. Antes de ordenar, o scheduler elimina tarefas
+sem contrato aceito, dependências concluídas, capacidade compatível ou autorização.
+A prioridade efetiva é calculada por regras do projeto, com aging limitado pela
+política, e desempate estável por criação e ID. O agente pode propor prioridade,
+mas não conceder a si mesmo precedência ou recursos.</p>
+<p>Depois da seleção, uma transação confere conflitos, orçamento e revisão novamente.
+Somente o claim bem-sucedido inicia o run. Uma lista de tarefas nativa de IDE é
+uma visão ou origem de propostas, nunca uma segunda fila com autoridade própria.</p>
+<p>Limite inicial proposto: três slots de trabalho de agente por projeto, configuráveis
+após medição. Uma revisão que usa LLM também ocupa slot. Testes e builds têm quota
+computacional própria e limitada, sem multiplicar processos livremente. Aumentar
+workers exige medir fila de revisão, memória, CPU, custos e limites dos provedores.</p>
+<p>Regras de colaboração:</p>
+<ul>
+<li>Usar um agente para uma mudança pequena; fan-out somente para subtarefas úteis.</li>
+<li>Contratos compartilhados entram antes das implementações dependentes.</li>
+<li>Um proprietário ativo por recurso de escrita conflitante. Reservar também
+  bancos de teste, portas, caches, artefatos e daemons quando compartilhados.</li>
+<li>Toda delegação registra pai, filho, revisão, ferramentas, recursos e orçamento.
+  Começar com profundidade de delegação de um nível; ampliar só com conformidade.</li>
+<li>Os limites do filho são subconjunto dos limites do pai. Retomadas e retries
+  preservam o consumo acumulado da tarefa e dos ancestrais.</li>
+<li>Mensagens têm remetente autenticado, destinatário permitido, ID, correlação e
+  referências. Deduplicar; não presumir ordem global nem broadcast ilimitado.</li>
+<li>Mensagens e votos não aprovam entregas, ampliam escopo ou alteram permissões.</li>
+</ul>
+<h2 id="6-tres-funcionarios-na-pratica">6. Três funcionários na prática</h2>
+<p>Uma feature ilustrativa precisa de contrato, API e interface:</p>
+<ol>
+<li>A prepara o contrato; C revisa e as verificações aplicáveis produzem recibos.
+   O gateway publica a revisão aceita antes das tarefas dependentes começarem.</li>
+<li>A implementa a API em seu run; B implementa a interface em outro. Ambos recebem
+   o mesmo contrato aceito, com recursos de escrita distintos.</li>
+<li>C examina plano, evidências e mudanças; o pool confiável executa testes em uma
+   combinação isolada. C não recebe a credencial de integração por ser revisor.</li>
+<li>O integrador incorpora a primeira alteração válida. A segunda é atualizada e
+   revalidada na nova base antes de integrar; conflitos retornam com diagnóstico.</li>
+<li>A tarefa termina com os recibos aceitos. Aprendizados reutilizáveis entram
+   como propostas e seguem o caminho de revisão do conhecimento.</li>
+</ol>
+<p>São três identidades próprias, não três contas compartilhadas. O adaptador pode
+usar uma sessão nativa autorizada ou API conforme o runner suportar. Login de
+assinatura não é tratado como chave genérica de API. Não copiar caches de login
+entre pessoas, serviços ou modelos. Papéis podem rodar entre funcionários,
+preservando a independência exigida pela política.</p>
+<h2 id="7-isolamento-e-efeitos">7. Isolamento e efeitos</h2>
+<p>O supervisor entrega ao worker um ambiente limitado por tarefa, sem escrita no
+checkout principal, sem socket Docker do host e sem credencial de merge. Worktrees
+ajudam a organizar branches; não bastam como fronteira de segurança. Metadados
+Git comuns também não podem ser montados com escrita que permita alterar outros
+runs. Usar snapshot/clone privado ou gestão de Git fora do alcance do executor.
+O primeiro perfil será Linux, com containers sem root e mounts mínimos. Outros
+sistemas operacionais exigem perfil e conformidade próprios; a portabilidade dos
+contratos não comprova portabilidade automática do isolamento.</p>
+<p>O worker pode editar e testar seu candidato dentro do escopo. Ações compartilhadas
+passam por gateway tipado, que valida identidade, lease, fencing, revisão, destino
+e argumentos. O broker usa segredos com escopo mínimo; o worker recebe capacidade
+restrita e de curta duração quando necessário, sem segredos persistidos em
+checkpoints, memória ou traces. Administrar uma conexão é diferente de usá-la.</p>
+<p>O validador também executa código candidato não confiável em sandbox, sem segredos
+de integração. O serviço confiável registra e autentica os recibos fora do alcance
+desse código. Comandos e oráculos são aceitos pelo projeto; o implementador não
+escolhe outro comando apenas para produzir uma saída de sucesso.</p>
+<p>Capacidades não comprovadas impedem execução que dependa delas. Um runner que só
+permita inspeção da entrega pode servir a tarefas compatíveis, mas não será
+anunciado como isolamento de execução. Filhos nativos não observáveis precisam
+ser desabilitados em runs que exijam delegação controlada.</p>
+<h2 id="8-memoria-e-caminhos-de-leituraescrita">8. Memória e caminhos de leitura/escrita</h2>
+<table>
+<thead>
+<tr>
+<th>Categoria</th>
+<th>Exemplo</th>
+<th>Como muda</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conhecimento normativo</td>
+<td>Requisito e contrato aceito</td>
+<td>Revisão autorizada no Git</td>
+</tr>
+<tr>
+<td>Estado operacional</td>
+<td>Prioridade, run, lease, orçamento</td>
+<td>Transação no core</td>
+</tr>
+<tr>
+<td>Memória aceita da tarefa</td>
+<td>Decisão, fonte e handoff vigentes</td>
+<td>API com revisão esperada</td>
+</tr>
+<tr>
+<td>Observações</td>
+<td>Resultado de investigação ou teste relatado</td>
+<td>Registro atribuído, ainda verificável</td>
+</tr>
+<tr>
+<td>Propostas</td>
+<td>Novo plano, correção ou aprendizado</td>
+<td>Aceite explícito no caminho aplicável</td>
+</tr>
+<tr>
+<td>Evidências</td>
+<td>Snapshot, diff e recibo</td>
+<td>Artefato imutável e referência por hash</td>
+</tr>
+<tr>
+<td>Contexto temporário</td>
+<td>Conversa, resumo e checkpoint</td>
+<td>Escopo do run; sem autoridade permanente</td>
+</tr>
+</tbody>
+</table>
+<p>O namespace inclui projeto, tarefa, run e status de aceitação. A identidade
+autenticada determina o acesso no servidor; o modelo não escolhe livremente outro
+namespace. Dois agentes podem acrescentar observações, mas não sobrescrever uma
+decisão aceita pela regra do último escritor. Conflitos de revisão exigem conciliação.</p>
+<p>Consulta: ID/path/símbolo/revisão exatos → busca textual → vetores opcionais →
+fusão/reranking se medidos → rechecagem de acesso e validade → manifesto citado.
+PostgreSQL FTS não é BM25; BM25 requer implementação própria. ONNX Runtime apenas
+executa modelos compatíveis. Scores e concordância entre agentes não provam fatos.</p>
+<p>Escrita: observação/proposta → validação tipada e autoria → decisão autorizada →
+nova revisão aceita → evento durável → atualização idempotente do índice. Registrar
+watermark e geração; descartar jobs atrasados. Revogar acesso antes de depender da
+limpeza do índice. Um resultado antigo não pode reaparecer no contexto do modelo.</p>
+<p>Chunks retêm origem, revisão, status, escopo, hash e configuração de embedding.
+Não misturar embeddings incompatíveis. Mudança de modelo/chunker cria outra geração
+avaliada antes da troca. Fontes originais, derivados e backups entram na política
+de retenção e exclusão. Não enviar material privado a embeddings ou traces externos
+sem autorização de dados para aquele destino.</p>
+<h2 id="9-contratos-de-execucao-e-interfaces-planejadas">9. Contratos de execução e interfaces planejadas</h2>
+<p>Os nomes seguintes são propostas de protocolo, não endpoints implementados:</p>
+<table>
+<thead>
+<tr>
+<th>Operação</th>
+<th>Entrada relevante</th>
+<th>Saída/condição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tasks.submit</code></td>
+<td>Projeto, mandato, objetivo, critérios e dependências</td>
+<td>Tarefa/revisão candidata</td>
+</tr>
+<tr>
+<td><code>tasks.accept</code></td>
+<td>Revisão esperada, identidade e decisão autorizada</td>
+<td>Contrato aceito ou conflito</td>
+</tr>
+<tr>
+<td><code>runs.claim</code></td>
+<td>Capacidade, recursos e orçamento requerido</td>
+<td>Lease, fencing, run e manifesto</td>
+</tr>
+<tr>
+<td><code>runs.heartbeat</code></td>
+<td>Identidade do run e concessão atual</td>
+<td>Renovação válida ou revogação</td>
+</tr>
+<tr>
+<td><code>memory.read</code></td>
+<td>Referências e consulta autorizada</td>
+<td>Fontes e manifesto de contexto</td>
+</tr>
+<tr>
+<td><code>memory.propose</code></td>
+<td>Autoria, evidências e revisão-base</td>
+<td>Proposta sem promoção automática</td>
+</tr>
+<tr>
+<td><code>memory.accept</code></td>
+<td>Decisor autorizado, fontes e revisão esperada</td>
+<td>Nova decisão aceita ou conflito</td>
+</tr>
+<tr>
+<td><code>effects.request</code></td>
+<td>Operação lógica, argumentos, destino e concessão</td>
+<td>Recibo ou estado incerto explícito</td>
+</tr>
+<tr>
+<td><code>effects.reconcile</code></td>
+<td>Identidade da operação e observação do destino</td>
+<td>Resultado comprovado ou recuperação pendente</td>
+</tr>
+<tr>
+<td><code>deliveries.submit</code></td>
+<td>Commit/base, artefatos e critérios</td>
+<td>Candidato aguardando gates</td>
+</tr>
+<tr>
+<td><code>validation.record</code></td>
+<td>Produtor confiável e entradas exatas</td>
+<td>Recibo autenticado e revisões</td>
+</tr>
+<tr>
+<td><code>integration.request</code></td>
+<td>Candidato, base atual e recibos exigidos</td>
+<td>Merge comprovado ou revalidação</td>
+</tr>
+</tbody>
+</table>
+<p>Todas as mutações relevantes têm schema, autorização, revisão e idempotência.
+Modelos, editores e protocolos diferentes usam as mesmas operações. Atualizar uma
+mensagem de chat ou um checkpoint não executa uma transição oficial por si só.</p>
+<p>Modelo de dados conceitual: <code>projects</code>, <code>workflow_releases</code>, <code>tasks</code>,
+<code>task_dependencies</code>, <code>runs</code>, <code>resource_reservations</code>, <code>budget_ledger</code>,
+<code>effect_intents</code>, <code>effect_receipts</code>, <code>decisions</code>, <code>observations</code>, <code>proposals</code>,
+<code>artifacts</code>, <code>validation_receipts</code>, <code>messages</code>, <code>outbox</code> e <code>index_generations</code>.
+Não é uma migração SQL pronta. Revisar unicidade, relacionamentos, isolamento e
+conflitos hierárquicos de recursos antes de implementar as tabelas.</p>
+<h2 id="10-caminhos-de-falha-e-retomada">10. Caminhos de falha e retomada</h2>
+<table>
+<thead>
+<tr>
+<th>Situação</th>
+<th>Caminho planejado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contrato incompleto ou fonte contraditória</td>
+<td>Investigar sem escrita; solicitar apenas a decisão não coberta pelo mandato</td>
+</tr>
+<tr>
+<td>Dependência, capacidade ou recurso indisponível</td>
+<td>Espera com motivo; sem claim ativo desnecessário</td>
+</tr>
+<tr>
+<td>Limite temporário do provedor</td>
+<td>Backoff limitado, respeitando orçamento e política de fallback</td>
+</tr>
+<tr>
+<td>Teste ou revisão reprovada</td>
+<td>Diagnóstico para nova tentativa dentro do contrato</td>
+</tr>
+<tr>
+<td>Arquivo fora do escopo</td>
+<td>Bloquear escrita; rejeitar candidato incompatível na entrega</td>
+</tr>
+<tr>
+<td>Lease expirado ou worker desconectado</td>
+<td>Revogar efeitos; preservar histórico e conciliar antes da retomada</td>
+</tr>
+<tr>
+<td>Crash depois de um efeito</td>
+<td>Consultar ledger/destino pela mesma identidade; não repetir às cegas</td>
+</tr>
+<tr>
+<td>Base mudou antes do merge</td>
+<td>Atualizar candidato e revalidar evidências afetadas</td>
+</tr>
+<tr>
+<td>Busca vazia, indisponível ou atrasada</td>
+<td>Leitura exata autorizada ou evidência insuficiente</td>
+</tr>
+<tr>
+<td>Traces indisponíveis</td>
+<td>Preservar ledger obrigatório; seguir política explícita de auditoria</td>
+</tr>
+<tr>
+<td>Cancelamento</td>
+<td>Revogar concessões, pedir parada e registrar confirmação ou limitação</td>
+</tr>
+<tr>
+<td>Limite de recuperação atingido</td>
+<td>Fila de recuperação com responsável e condição de continuidade</td>
+</tr>
+</tbody>
+</table>
+<p>O fluxo normal é pronta → reservada → executando → verificando → integrando →
+concluída. Há esperas, ajustes, reconciliação, cancelamento e falha final. Retomar
+checkpoint não renova orçamento ou permissões; restaurar workflow não desfaz
+efeitos anteriores. Compensação ou reversão é outra operação autorizada e verificada.</p>
+<h2 id="11-operacao-e-implantacao-por-etapas">11. Operação e implantação por etapas</h2>
+<p>Primeiro, um coordenador confiável no ambiente local, PostgreSQL, armazenamento
+restrito de artefatos e supervisor de execução. Workers e validadores são processos
+separados com fronteiras de permissão, mesmo no mesmo host. Comunicação por API
+autenticada; identidades dos serviços não são credenciais humanas compartilhadas.</p>
+<p>A evolução multi-host acrescenta workers autenticados, concessões verificadas,
+limites de transporte e recuperação de partições. Não depende de um provedor de
+cloud específico. Backup/restore deve alinhar registros, artefatos, revisões e
+gerações de índice antes de permitir novas escritas. Modo de manutenção suspende
+novos claims, drena ou revoga runs e concilia efeitos pendentes.</p>
+<p>O painel mostrará tarefa, dono, dependências, orçamento, lease, candidato, gates,
+diff e recuperação. Formulários gerados continuam sujeitos ao mesmo servidor.
+O núcleo permanece utilizável sem painel. LangSmith ou Langfuse observam; nenhum
+tracer é o ledger oficial. O envio externo é opt-in, sanitizado e testado.</p>
+<p>A avaliação mantém dois vereditos: cumprimento das invariantes operacionais e
+resultado da tarefa. Um judge semântico não supera uma violação obrigatória.
+Quando usado, deve ser calibrado com casos rotulados, incluindo falsos aceites,
+e avaliado em casos reservados fora do ajuste de prompts. Registrar ações,
+resultados e decisões concisas; não solicitar raciocínio privado dos modelos.</p>
+<h2 id="12-ordem-de-construcao-e-criterios-de-saida">12. Ordem de construção e critérios de saída</h2>
+<table>
+<thead>
+<tr>
+<th>Marco</th>
+<th>Construir</th>
+<th>Demonstrar antes de avançar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M0 — base existente</td>
+<td>Contratos v1, validador e CI</td>
+<td>Limites do protótipo explícitos</td>
+</tr>
+<tr>
+<td>M1 — coordenação</td>
+<td>API, PostgreSQL, claims, recursos, orçamento e outbox</td>
+<td>Dois claims conflitantes não obtêm autoridade; revisão obsoleta é rejeitada</td>
+</tr>
+<tr>
+<td>M2 — contenção</td>
+<td>Supervisor, gateway de efeitos, validador e integração</td>
+<td>Escape de workspace falha; efeito com fencing antigo é recusado</td>
+</tr>
+<tr>
+<td>M3 — execução pequena</td>
+<td>Um runner real e adaptador LangGraph limitado</td>
+<td>Crash/replay não duplica efeito aceito nem renova orçamento</td>
+</tr>
+<tr>
+<td>M4 — memória mínima</td>
+<td>API tipada, fontes por hash, busca exata/textual</td>
+<td>Conflito de decisão e vazamento entre projetos são rejeitados</td>
+</tr>
+<tr>
+<td>M5 — interoperabilidade</td>
+<td>Segundo runner diferente e três slots controlados</td>
+<td>Mesmo workflow e gates em ambos; integração concorrente sem sobrescrita</td>
+</tr>
+<tr>
+<td>M6 — avaliação e escala</td>
+<td>Telemetria, fixtures, pgvector opcional e capacidade</td>
+<td>Ganho medido sem relaxar invariantes; restauração testada</td>
+</tr>
+</tbody>
+</table>
+<p>M1–M4 podem ter incrementos intercalados: o primeiro runner recebe contexto exato
+do Git antes de haver busca completa. O primeiro piloto termina em candidato
+reviewável; merge automático só é habilitado após os controles do gateway terem
+evidência e autorização do projeto. A aprovação desta arquitetura não instala
+serviços nem autoriza deploy, gastos ou merge de implementações futuras.</p>
+<h2 id="13-como-os-estudos-entram-no-projeto">13. Como os estudos entram no projeto</h2>
+<table>
+<thead>
+<tr>
+<th>Origem</th>
+<th>Aplicação no desenho</th>
+<th>Limite preservado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relatório de domínio inicial</td>
+<td>Pacote de projeto, requisitos e fontes privadas</td>
+<td>Não publicar seu conteúdo no harness genérico</td>
+</tr>
+<tr>
+<td>IBM Concert Workflows</td>
+<td>Catálogo de ações, conexões, pools, releases e recuperação</td>
+<td>Não pressupor integração pronta com runners</td>
+</tr>
+<tr>
+<td>DoorDash</td>
+<td>Tarefa delimitada, estado real, validação e avaliação de manutenção</td>
+<td>Não transferir números de produtividade</td>
+</tr>
+<tr>
+<td>AWS RAG</td>
+<td>Separar recuperação, geração, avaliação e observabilidade</td>
+<td>Judge não substitui gate nem sandbox</td>
+</tr>
+<tr>
+<td>ADK</td>
+<td>Alternativa atrás do contrato de engine</td>
+<td>Sem scheduler concorrente sobre a mesma tarefa</td>
+</tr>
+<tr>
+<td>Claude e referências de times</td>
+<td>Subtarefas, peers, mensagens, goals e limites nativos</td>
+<td>Memória nativa e consenso não são autoridade</td>
+</tr>
+<tr>
+<td>OpenAI e registros reutilizáveis</td>
+<td>Diário, resultados, decisões, falhas e índice curado</td>
+<td>Não guardar raciocínio privado nem promover logs automaticamente</td>
+</tr>
+<tr>
+<td>LangChain/LangGraph/Deep Agents</td>
+<td>Camadas de execução e componentes substituíveis</td>
+<td>Não confundir contexto isolado com isolamento de processos</td>
+</tr>
+<tr>
+<td>MongoDB/PostgreSQL/RAG</td>
+<td>Persistência por papel e recuperação avaliada</td>
+<td>ACID e relevância não resolvem todo o protocolo</td>
+</tr>
+<tr>
+<td>Swarms, tutoriais e Thesys</td>
+<td>Padrões de colaboração e visibilidade para operadores</td>
+<td>Demos e marketing não certificam capacidades</td>
+</tr>
+</tbody>
+</table>
+<p>Detalhes e fontes verificadas estão em <a href="../architecture.md">arquitetura</a>,
+<a href="../development-teams.md">times</a>, <a href="../task-memory.md">memória</a>,
+<a href="../langchain-integration.md">LangChain</a>, <a href="../storage-and-retrieval.md">armazenamento</a>
+e <a href="../evaluation.md">avaliação</a>, com os registros de pesquisa em <code>docs/research/</code>.
+Os diagramas são documentação do plano; sua validação verifica o artefato visual,
+não comprova as propriedades de segurança do futuro runtime.</p>
+<p>Registros de fontes: <a href="../research/2026-10-20-doordash-adk-aws.md">DoorDash, AWS e ADK</a>,
+<a href="../research/2026-10-20-coding-teams-and-swarms.md">times e enxames</a>,
+<a href="../research/2026-10-20-langchain-ecosystem.md">LangChain</a> e
+<a href="../research/2026-10-20-mongodb-postgresql-and-swarms.md">bancos e tutoriais</a>.
+Para a inspiração enterprise, consultar <a href="https://www.ibm.com/br-pt/products/concert/workflows">IBM Concert Workflows</a>,
+<a href="https://www.ibm.com/docs/en/concert/3.0.x?topic=workflows-workflow-version-control">versionamento</a>
+e <a href="https://www.ibm.com/docs/en/SSQNYH_3.0.x/administering/remote-workers.html">workers remotos</a>.</p>
+<h2 id="14-editar-e-reproduzir-os-mapas">14. Editar e reproduzir os mapas</h2>
+<p>Cada HTML tem uma fonte JSON do mesmo prefixo. Usar a skill Archify 3.2.0,
+commit <code>208acba8d412335185b2056fedf54b3405df43fb</code>. Definir <code>ARCHIFY_DIR</code> como a
+pasta da skill instalada e executar, nesta pasta, por exemplo:</p>
+<pre><code class="language-sh">node &quot;$ARCHIFY_DIR/bin/archify.mjs&quot; finalize architecture 01-sistema.architecture.json 01-sistema.html --quality showcase --out-dir reviews/local-01 --json
+</code></pre>
+<p>Para os demais arquivos, os modos são <code>workflow</code>, <code>dataflow</code>, <code>lifecycle</code> e
+<code>sequence</code>. Preservar fonte e significado; usar outra pasta de evidências após
+alterar um artefato já verificado. O índice de leitura precisa acompanhar este
+Markdown quando o texto mudar. Recibos locais do Archify podem conter caminhos
+da máquina; não publicá-los sem sanitização. O manifesto de proveniência incluído
+registra versão e hashes sem esses caminhos.</p>
+<p>Os visualizadores carregam código do Archify sob MIT e fontes sob OFL; consultar
+<code>ARCHIFY-LICENSE.txt</code>, <code>THIRD_PARTY_NOTICES.md</code> e <code>JetBrainsMono-OFL.txt</code>.
+Fontes dos diagramas e documentação própria seguem a licença do projeto.</p></article><footer>Diagramas gerados com Archify 3.2.0, fonte editável incluída. O visualizador é MIT; a documentação do projeto permanece Apache-2.0. Consulte THIRD_PARTY_NOTICES.md e ARCHIFY-LICENSE.txt.</footer></main></body></html>

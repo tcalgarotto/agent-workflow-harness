@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "05 · Exemplo com três funcionários · ARQUITETURA PLANEJADA",
+    "output": "05-tres-funcionarios.html",
+    "quality_profile": "showcase"
+  },
+  "participants": [
+    {
+      "id": "planner",
+      "type": "backend",
+      "label": "Core",
+      "sublabel": "Tarefas e recursos"
+    },
+    {
+      "id": "a",
+      "type": "backend",
+      "label": "Funcionário A",
+      "sublabel": "Runner e sandbox A"
+    },
+    {
+      "id": "b",
+      "type": "backend",
+      "label": "Funcionário B",
+      "sublabel": "Runner e sandbox B"
+    },
+    {
+      "id": "c",
+      "type": "security",
+      "label": "Funcionário C",
+      "sublabel": "Revisão independente"
+    },
+    {
+      "id": "gateway",
+      "type": "security",
+      "label": "Integração",
+      "sublabel": "Gates e Git"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "from": "planner",
+      "to": "a",
+      "y": 165,
+      "label": "T1: propor contrato",
+      "variant": "security"
+    },
+    {
+      "id": "m2",
+      "from": "a",
+      "to": "planner",
+      "y": 208,
+      "label": "Contrato candidato e evidências",
+      "variant": "return"
+    },
+    {
+      "id": "m3",
+      "from": "planner",
+      "to": "c",
+      "y": 251,
+      "label": "Validar e revisar T1",
+      "variant": "security"
+    },
+    {
+      "id": "m4",
+      "from": "c",
+      "to": "planner",
+      "y": 294,
+      "label": "Contrato validado e revisado",
+      "variant": "return"
+    },
+    {
+      "id": "m5",
+      "from": "planner",
+      "to": "gateway",
+      "y": 337,
+      "label": "Publicar T1: base e gates",
+      "variant": "security"
+    },
+    {
+      "id": "m6",
+      "from": "gateway",
+      "to": "planner",
+      "y": 380,
+      "label": "Revisão aceita do contrato",
+      "variant": "return"
+    },
+    {
+      "id": "m7",
+      "from": "planner",
+      "to": "b",
+      "y": 423,
+      "label": "T2: UI no contrato aceito",
+      "variant": "security"
+    },
+    {
+      "id": "m8",
+      "from": "planner",
+      "to": "a",
+      "y": 466,
+      "label": "T3: API no mesmo contrato",
+      "variant": "security"
+    },
+    {
+      "id": "m9",
+      "from": "planner",
+      "to": "c",
+      "y": 509,
+      "label": "Revisar plano e critérios",
+      "variant": "security"
+    },
+    {
+      "id": "m10",
+      "from": "a",
+      "to": "planner",
+      "y": 552,
+      "label": "Candidato API + evidências",
+      "variant": "return"
+    },
+    {
+      "id": "m11",
+      "from": "b",
+      "to": "planner",
+      "y": 595,
+      "label": "Candidato UI + evidências",
+      "variant": "return"
+    },
+    {
+      "id": "m12",
+      "from": "planner",
+      "to": "c",
+      "y": 638,
+      "label": "Validar combinação isolada",
+      "variant": "security"
+    },
+    {
+      "id": "m13",
+      "from": "c",
+      "to": "planner",
+      "y": 681,
+      "label": "Recibos de teste e revisão",
+      "variant": "return"
+    },
+    {
+      "id": "m14",
+      "from": "planner",
+      "to": "gateway",
+      "y": 724,
+      "label": "Integrar API: base e gates",
+      "variant": "security"
+    },
+    {
+      "id": "m15",
+      "from": "gateway",
+      "to": "planner",
+      "y": 767,
+      "label": "Merge API comprovado",
+      "variant": "return"
+    },
+    {
+      "id": "m16",
+      "from": "planner",
+      "to": "c",
+      "y": 810,
+      "label": "Validar UI na nova base",
+      "variant": "security"
+    },
+    {
+      "id": "m17",
+      "from": "c",
+      "to": "planner",
+      "y": 853,
+      "label": "Recibos da nova combinação",
+      "variant": "return"
+    },
+    {
+      "id": "m18",
+      "from": "planner",
+      "to": "gateway",
+      "y": 896,
+      "label": "Integrar UI: base e gates",
+      "variant": "security"
+    },
+    {
+      "id": "m19",
+      "from": "gateway",
+      "to": "planner",
+      "y": 939,
+      "label": "Merge UI e fechamento",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Cenário ilustrativo",
+      "items": [
+        "Exemplo genérico de feature API + UI; nenhuma tarefa real foi executada.",
+        "Contrato compartilhado é aceito antes das implementações dependentes.",
+        "T2 e T3 são independentes somente se recursos e contratos permitirem."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Três slots, papéis rotativos",
+      "items": [
+        "Cada funcionário mantém sua conta e identidade, sem compartilhar login.",
+        "C pode revisar enquanto A e B implementam; validação usa runner confiável.",
+        "Uma mesma pessoa pode trocar papel, respeitando a independência exigida."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Convergência sem sobrescrita",
+      "items": [
+        "Scopes e workspaces separados; conflitos semânticos ainda exigem análise.",
+        "Após integrar API, a UI é revalidada sobre a base resultante.",
+        "Uma entrega reprovada volta à fila com orçamento e histórico preservados."
+      ]
+    }
+  ]
+}
