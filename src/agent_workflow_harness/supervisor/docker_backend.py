@@ -121,8 +121,10 @@ class DockerBackend:
         errors = []
 
         def collect():
+            stream = None
             try:
-                for first, second in self.client.api.exec_start(execution["Id"], stream=True, demux=True):
+                stream = self.client.api.exec_start(execution["Id"], stream=True, demux=True)
+                for first, second in stream:
                     for part in (first, second):
                         if part:
                             room = profile.output_bytes - len(output)
@@ -133,6 +135,19 @@ class DockerBackend:
             except Exception as error:
                 errors.append(type(error).__name__)
             finally:
+                if stream is not None:
+                    # docker-py 7.x returns CancellableStream, whose close()
+                    # shuts down the socket but does not close its HTTP response.
+                    # The streaming caller owns both, including normal EOF.
+                    try:
+                        try:
+                            stream.close()
+                        except OSError:
+                            pass
+                        finally:
+                            stream._response.close()
+                    except Exception as error:
+                        errors.append(type(error).__name__)
                 done.set()
 
         thread = threading.Thread(target=collect, daemon=True)

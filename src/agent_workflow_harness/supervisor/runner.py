@@ -97,7 +97,7 @@ class Supervisor:
                     raise UnsafeExecution("validator_stop_unconfirmed")
                 if not guard():
                     raise UnsafeExecution("authority_lost")
-                payload = {"protocol": "m2a-receipt-1", **manifest,
+                payload = {**manifest, "protocol": "m2a-receipt-1",
                            "manifest_hash": manifest_hash, "candidate_hash": state["candidate_hash"],
                            "commands": {"worker": profile.worker_command, "validator": profile.validator_command},
                            "worker": work, "validator": validation,

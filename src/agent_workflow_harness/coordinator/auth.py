@@ -23,7 +23,7 @@ class Principal:
 
 class Credential(Model):
     subject: Identifier
-    role: Literal["controller", "worker", "reader", "supervisor"]
+    role: Literal["controller", "worker", "reader", "supervisor", "integrator"]
     projects: list[Identifier] = Field(min_length=1, max_length=100)
     capabilities: list[Identifier] = Field(max_length=64)
     token_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -63,3 +63,11 @@ class Auth:
             return None
         return Principal(match.subject, match.role, frozenset(match.projects),
                          frozenset(match.capabilities))
+
+    def subject(self, subject):
+        """Resolve an operator grant, never a role/capability claimed by a worker."""
+        for credential in self._credentials:
+            if credential.subject == subject:
+                return Principal(credential.subject, credential.role, frozenset(credential.projects),
+                                 frozenset(credential.capabilities))
+        return None

@@ -7,7 +7,10 @@ O validador estático v1 continua independente; `protocol: "m1"` é outro contra
 
 Extensão atual: o [supervisor M2a](m2a-supervisor.md) usa esta API para executar
 comandos em contêineres próprios e registrar parada/recibos. Atualize a API com a
-migração 002 antes de habilitá-lo; o schema 001 e os contratos v1 não são alterados.
+migração atual (001–003) antes de habilitá-lo; o SQL 001 e os contratos v1 não são
+alterados. O [gateway M2b](m2b-integration.md) usa a extensão 003 para controlar
+integrações Git locais. Pare todos os processos antigos antes de atualizar schema
+e serviços; eles desconhecem os bloqueios das extensões.
 
 ## Executar
 
@@ -31,6 +34,7 @@ Crie fora do repositório um arquivo JSON de credenciais, com permissão `0600`.
 Cada entrada contém `subject`, `role`, `projects`, `capabilities` e
 `token_sha256`. Os papéis básicos são `controller`, `worker` e `reader`; o
 [M2a](m2a-supervisor.md) acrescenta `supervisor` para o serviço de execução confiável.
+O [M2b](m2b-integration.md) acrescenta `integrator`, sem permissões de worker/controller.
 Gere um token aleatório independente por identidade, com pelo menos 32 bytes
 aleatórios, usando seu gerenciador de segredos ou `secrets.token_urlsafe(32)`.
 Armazene no arquivo somente seu digest hexadecimal SHA-256; entregue o token ao
@@ -84,6 +88,7 @@ migração (a criação do role e sua autenticação são tarefas do operador):
 GRANT USAGE ON SCHEMA awh_m1 TO awh_service;
 GRANT SELECT ON ALL TABLES IN SCHEMA awh_m1 TO awh_service;
 GRANT INSERT, UPDATE ON awh_m1.projects, awh_m1.tasks, awh_m1.runs TO awh_service;
+GRANT INSERT, UPDATE ON awh_m1.executions TO awh_service;
 GRANT INSERT, DELETE ON awh_m1.dependencies, awh_m1.reservations TO awh_service;
 GRANT INSERT ON awh_m1.commands, awh_m1.budget_ledger, awh_m1.outbox TO awh_service;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA awh_m1 TO awh_service;
@@ -104,6 +109,7 @@ append-only pela API, mas não é um log inviolável contra o administrador do b
 | `GET /v1/projects/{project}/tasks/{task}` | Documento, estado, revisão e consumo |
 | `GET /v1/projects/{project}/runs/{run}` | Run, fence e validade temporal do lease |
 | `GET /v1/projects/{project}/events` | Outbox ordenada, com cursor `after` e `limit` |
+| `GET /v1/projects/{project}/integrations/{id}` | Registro histórico da integração M2b |
 
 Identidades só enxergam os projetos concedidos na configuração do servidor.
 Worker não pode se promover a controller, aceitar tarefas ou reconciliar runs.
@@ -199,6 +205,13 @@ atestação, consome conservadoramente o saldo reservado, libera recursos e volt
 à fila (ou mantém cancelled). Não interpreta a referência nem para processos.
 Restaurar backups/recriar bancos pode afetar monotonicidade de fences; não reabrir
 autoridade após restore sem reconciliação e protocolo adicional no M2.
+
+Para projetos com política M2b registrada, `finish` e `decide complete` são
+recusados: a conclusão depende do gateway. Validação M2b sem parada confirmada
+impede liberar recursos por reconcile. Uma permissão de integração `prepared`
+retém o run e impede cancelamento, expiração, renovação e liberação até reconciliar
+o efeito externo. Isso é uma autorização durável já emitida, não uma lease nova.
+Veja o [ponto de não retorno e recuperação](m2b-integration.md) antes de operar.
 
 ## Orçamento, outbox e falhas
 

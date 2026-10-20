@@ -2,7 +2,8 @@
 
 O supervisor executa comandos sintéticos ou de desenvolvimento em um perfil
 Linux/Docker limitado. O coordenador M1 continua dono de tarefas e concessões.
-Ainda não há agente de IA, LangGraph ou integração automática com Git.
+Ainda não há agente de IA ou LangGraph. A integração Git local é um componente
+separado: [gateway M2b](m2b-integration.md), com autorização e revalidação próprias.
 
 ## Fronteiras e perfil disponível
 
@@ -50,12 +51,15 @@ preserve backup e execute a migração com a identidade de migração:
 ```
 
 Não misture servidores M1 antigos e novos durante a atualização. O SQL 001
-permanece idêntico; 002 acrescenta `awh_m1.executions` e sua restrição de unicidade.
+permanece idêntico; 002 acrescenta `awh_m1.executions` e sua restrição de unicidade,
+e 003 acrescenta os registros/barreiras do [M2b](m2b-integration.md).
 Migrate confere checksums, aplica o sufixo faltante em transação e não apaga dados.
 Para um role de serviço existente, conceda como owner da migração:
 
 ```sql
 GRANT SELECT, INSERT, UPDATE ON awh_m1.executions TO awh_service;
+GRANT SELECT ON awh_m1.integration_policies, awh_m1.integrations,
+    awh_m1.integration_reviews TO awh_service;
 ```
 
 Adicione ao arquivo privado `AWH_AUTH_FILE` uma identidade de serviço com
@@ -208,7 +212,7 @@ dentro desse domínio de confiança; não é assinatura pública entre organiza�
 O comando retorna `accepted_for_integration: false`: autenticação não substitui
 revisão, critérios adequados nem checagem da base atual. Um teste inadequado ou
 um candidato que influencia a lógica de testes exige oráculos/revisão melhores;
-um exit code zero, por si, não prova a intenção do produto. O M2b verificará a
+um exit code zero, por si, não prova a intenção do produto. O [M2b](m2b-integration.md) verifica a
 autorização e a combinação exata na integração. M1 `decide` continua uma atestação
 manual de controller e não se torna um gateway automatizado com esta entrega.
 
