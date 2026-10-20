@@ -9,6 +9,11 @@ for the end-to-end plan, three-worker example, recovery paths and implementation
 milestones. Its [Portuguese source](blueprint/README.pt-BR.md) is a dated design
 snapshot; the [M1 guide](m1-coordination.md) records current implementation status.
 
+Start with the [operational blueprint and interactive maps](blueprint/index.html)
+for the end-to-end plan, three-worker example, recovery paths and implementation
+milestones. Its [Portuguese source](blueprint/README.pt-BR.md) distinguishes the
+existing validator from proposed services and controls.
+
 ## Reusable layers
 
 1. Core: task state, authorization, resource reservations, events, and evidence.
