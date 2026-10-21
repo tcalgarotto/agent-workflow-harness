@@ -34,6 +34,10 @@ class TaskBinding:
 class PreparedExecution:
     binding: TaskBinding
     workspace: Path
+    # Optional path as seen from inside an independently enforced runtime
+    # (for example /workspace in a task container). The host workspace above
+    # remains the authority and receipt-validation path.
+    runtime_workspace: str | None = None
 
 
 @dataclass(frozen=True)

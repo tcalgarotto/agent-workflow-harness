@@ -32,6 +32,11 @@ a LangGraph runtime, RAG, MCP endpoints, provider adapters,
 or remote GitHub publication. Validating a declaration does not prove that a runner enforces
 it. This is not production security software and does not promise zero hallucinations.
 
+M3 now has initial Codex task-boundary primitives for private run homes,
+per-task network topology, and an allowlisted HTTPS proxy. They are documented
+in [the M3 boundary note](docs/m3-agent-boundary.md); a production CLI process
+runner and live headless execution are still not implemented.
+
 The initial six-profile setup and its non-authenticating preflight are described
 in [Headless CLI profiles](docs/cli-executors.md). The provider-neutral
 executor contract and Codex app-server protocol helpers are tested, but there is

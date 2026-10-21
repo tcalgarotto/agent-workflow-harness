@@ -7,7 +7,7 @@ limits provider egress. A boundary receipt binds those controls to one run.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import hashlib
 import json
 from pathlib import Path
@@ -33,6 +33,7 @@ class BoundaryReceipt:
     isolation_id: str
     network_policy_digest: str
     tool_gateway_id: str
+    runtime_workspace: str = "/workspace"
 
 
 class ManagedProcess(Protocol):
@@ -136,12 +137,13 @@ class ManagedCodexAppServer:
         _validate_receipt(receipt, execution, self.profile_id)
         process = self.boundary.spawn(receipt, app_server_command(self.executable))
         client = CodexAppServerClient(process.stdout, process.stdin)
+        runtime_execution = replace(execution, runtime_workspace=receipt.runtime_workspace)
         try:
             client.initialize()
             if resume_id:
-                session_id, turn_id = client.resume(execution, resume_id, prompt)
+                session_id, turn_id = client.resume(runtime_execution, resume_id, prompt)
             else:
-                session_id, turn_id = client.start(execution, prompt, model=model)
+                session_id, turn_id = client.start(runtime_execution, prompt, model=model)
         except Exception:
             stopped = self.boundary.terminate(process, 0)
             if not stopped or process.poll() is None:
@@ -163,7 +165,8 @@ def _validate_receipt(receipt: BoundaryReceipt, execution: PreparedExecution,
             or receipt.binding_digest != _binding_digest(execution)
             or not receipt.isolation_id
             or not receipt.network_policy_digest
-            or not receipt.tool_gateway_id):
+            or not receipt.tool_gateway_id
+            or receipt.runtime_workspace != "/workspace"):
         raise BoundaryViolation("boundary receipt does not match the task binding")
 
 

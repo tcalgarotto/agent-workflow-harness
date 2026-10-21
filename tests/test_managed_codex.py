@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from io import StringIO
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -101,6 +102,24 @@ class ManagedCodexTest(unittest.TestCase):
                 adapter.start(execution, "work")
             self.assertEqual(0, boundary.spawned)
 
+    def test_receipt_cannot_redirect_agent_working_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            execution = self.prepared(directory)
+
+            class RedirectedReceiptBoundary(FakeBoundary):
+                def prepare(self, execution, profile_id):
+                    receipt = super().prepare(execution, profile_id)
+                    return BoundaryReceipt(
+                        receipt.profile_id, receipt.workspace, receipt.binding_digest,
+                        receipt.isolation_id, receipt.network_policy_digest,
+                        receipt.tool_gateway_id, "/etc")
+
+            boundary = RedirectedReceiptBoundary(execution, rpc_results())
+            adapter = ManagedCodexAppServer("codex-cli-1", boundary, lambda *_: True)
+            with self.assertRaises(BoundaryViolation):
+                adapter.start(execution, "work")
+            self.assertEqual(0, boundary.spawned)
+
     def test_lifecycle_reports_interrupt_request_separately_from_stop_confirmation(self):
         with tempfile.TemporaryDirectory() as directory:
             execution = self.prepared(directory)
@@ -109,6 +128,11 @@ class ManagedCodexTest(unittest.TestCase):
             session = adapter.start(execution, "work")
             self.assertEqual("thread_1", session.session_id)
             self.assertEqual("turn_1", session.turn_id)
+            sent = [json.loads(line)
+                    for line in boundary.process.stdin.getvalue().splitlines()]
+            thread_start = next(message for message in sent
+                                if message.get("method") == "thread/start")
+            self.assertEqual("/workspace", thread_start["params"]["cwd"])
 
             requested = adapter.request_cancel(session)
             self.assertTrue(requested.requested)

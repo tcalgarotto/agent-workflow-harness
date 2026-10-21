@@ -38,9 +38,13 @@ open; this milestone group is not complete end-to-end.
 - [x] Fail-closed Codex lifecycle manager contract: every launch requires a
       boundary receipt bound to the complete task run and selected profile;
       lifecycle semantics are exercised with a fake boundary only.
+- [x] First task-boundary primitives: private Codex run home and permission
+      profile, task-only isolated Docker network, HTTPS egress allowlist proxy,
+      and runtime workspace binding; unit tests plus a manual local Docker
+      network check. These primitives are not a process runner.
 - [ ] Managed Codex app-server process adapter behind a task-scoped execution
-      backend, with versioned conformance and no credential inspection. The
-      manager currently depends on an interface; no production boundary exists.
+      backend, with versioned conformance and no credential inspection. No
+      production boundary exists yet.
 - [ ] Six separately selectable CLI profiles: four isolated Codex homes, one
       Antigravity CLI, and one Claude Code CLI; profiles are not account/person
       identities and credentials are never pooled.

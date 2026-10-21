@@ -60,8 +60,8 @@ class CodexAppServerProtocolTest(unittest.TestCase):
 
             turn = json.loads(start_turn_request(execution, "thread_123", "Inspect task"))
             self.assertEqual("turn/start", turn["method"])
-            self.assertEqual("externalSandbox", turn["params"]["sandboxPolicy"]["type"])
-            self.assertEqual("restricted", turn["params"]["sandboxPolicy"]["networkAccess"])
+            self.assertEqual(str(root), turn["params"]["cwd"])
+            self.assertNotIn("sandboxPolicy", turn["params"])
             self.assertEqual("never", turn["params"]["approvalPolicy"])
             cancel = json.loads(interrupt_turn_request("thread_123", "turn_9"))
             self.assertEqual("turn/interrupt", cancel["method"])
@@ -74,6 +74,18 @@ class CodexAppServerProtocolTest(unittest.TestCase):
             execution = PreparedExecution(binding, Path(temporary))
             with self.assertRaises(ValueError):
                 start_turn_request(execution, "thread_123", " ")
+
+    def test_container_workspace_is_used_only_when_explicitly_bound(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            execution = PreparedExecution(
+                TaskBinding("p", "t", "r", 1, "a" * 64, "codex-cli-1"),
+                Path(temporary), runtime_workspace="/workspace")
+            request = json.loads(start_thread_request(execution))
+            self.assertEqual("/workspace", request["params"]["cwd"])
+            for unsafe in ["relative", "/workspace/../secret", "/bad\x00path"]:
+                with self.subTest(unsafe=unsafe), self.assertRaises(ValueError):
+                    start_thread_request(PreparedExecution(
+                        execution.binding, execution.workspace, runtime_workspace=unsafe))
 
     def test_known_events_are_normalized_without_free_form_payload(self):
         line = json.dumps({

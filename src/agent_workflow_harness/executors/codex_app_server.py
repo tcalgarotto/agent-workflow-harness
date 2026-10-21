@@ -139,10 +139,19 @@ class CodexAppServerClient:
 
 
 def _workspace(execution: PreparedExecution) -> str:
+    if execution.runtime_workspace is not None:
+        return _runtime_workspace(execution.runtime_workspace)
     workspace = Path(execution.workspace)
     if not workspace.is_absolute() or not workspace.is_dir():
         raise ValueError("prepared execution requires an existing absolute workspace")
     return str(workspace.resolve())
+
+
+def _runtime_workspace(value: str) -> str:
+    if (not isinstance(value, str) or not value.startswith("/")
+            or "\x00" in value or ".." in Path(value).parts):
+        raise ValueError("runtime workspace must be a safe absolute path")
+    return value
 
 
 def app_server_command(executable: str = "codex") -> list[str]:
@@ -166,11 +175,8 @@ def initialized_notification() -> str:
 def start_thread_request(execution: PreparedExecution, request_id: int = 1,
                          service_name: str = "agent-workflow-harness") -> str:
     """Create a provider thread bound to the task's working directory."""
-    workspace = Path(execution.workspace)
-    if not workspace.is_absolute() or not workspace.is_dir():
-        raise ValueError("prepared execution requires an existing absolute workspace")
     return rpc_request(request_id, "thread/start", {
-        "cwd": str(workspace.resolve()),
+        "cwd": _workspace(execution),
         "serviceName": service_name,
     })
 
@@ -188,15 +194,12 @@ def resume_thread_request(execution: PreparedExecution, session_id: str,
 
 def start_turn_request(execution: PreparedExecution, session_id: str, prompt: str,
                        request_id: int = 3) -> str:
-    """Start a turn that relies on an external task sandbox for enforcement.
+    """Start a turn using the Codex permissions profile loaded in its CODEX_HOME.
 
-    The app-server sandbox field is an instruction to Codex, not independent
-    AWH enforcement. The caller must start app-server through a verified
-    task-scoped boundary before sending this request.
+    The containing process must already be inside AWH's independently verified
+    task boundary. No request-level sandbox override is sent, since it could
+    bypass the selected named permissions profile.
     """
-    workspace = Path(execution.workspace)
-    if not workspace.is_absolute() or not workspace.is_dir():
-        raise ValueError("prepared execution requires an existing absolute workspace")
     if not isinstance(session_id, str) or not _SAFE_ID.fullmatch(session_id):
         raise ValueError("session ID has an invalid shape")
     if not isinstance(prompt, str) or not prompt.strip() or len(prompt) > 200_000:
@@ -204,9 +207,8 @@ def start_turn_request(execution: PreparedExecution, session_id: str, prompt: st
     return rpc_request(request_id, "turn/start", {
         "threadId": session_id,
         "input": [{"type": "text", "text": prompt}],
-        "cwd": str(workspace.resolve()),
+        "cwd": _workspace(execution),
         "approvalPolicy": "never",
-        "sandboxPolicy": {"type": "externalSandbox", "networkAccess": "restricted"},
     })
 
 
