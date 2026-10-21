@@ -37,10 +37,11 @@ first persistent coordinator and treats lexical/vector retrieval as replaceable
 projections. Database transactions, checkpoint storage and search freshness have
 separate semantics. See [ADR 0005](decisions/0005-postgresql-first-storage-and-retrieval.md).
 
-M3 starts with headless CLI executors: three independently configured Codex CLI
-profiles, one Antigravity CLI profile, and one Claude Code profile. Each profile
-is a separate account-context/configuration boundary; a CLI process never receives
-another profile's authentication context. See
+M3 starts with headless CLI executors: four independently configured Codex CLI
+profiles, one Antigravity CLI profile, and one Claude Code profile. A profile is
+an invocation context, not a person or unique provider account; each Codex
+profile has its own `CODEX_HOME`. A CLI process never receives another profile's
+authentication context. See
 [ADR 0009](decisions/0009-headless-cli-executors.md). M2a's existing Docker
 profile has no network or provider credentials, so it cannot directly host a
 provider CLI that needs both. A CLI must not be launched against a shared host

@@ -6,13 +6,13 @@
     "schema_version": {"const": "1"},
     "profiles": {
       "type": "array",
-      "minItems": 5,
-      "maxItems": 5,
+      "minItems": 6,
+      "maxItems": 6,
       "items": {
         "type": "object",
         "properties": {
           "profile_id": {
-            "enum": ["codex-employee-1", "codex-employee-2", "codex-employee-3", "antigravity", "claude-code"]
+            "enum": ["codex-cli-1", "codex-cli-2", "codex-cli-3", "codex-cli-4", "antigravity", "claude-code"]
           },
           "provider": {"enum": ["codex", "antigravity", "claude"]},
           "executable": {"enum": ["codex", "agy", "claude"]},

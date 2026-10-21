@@ -1,16 +1,18 @@
 # ADR 0009: headless CLI executors and isolated identity profiles
 
-- Status: accepted for M3 design; implementation and provider conformance pending.
+- Status: accepted for M3 design; profile preflight and protocol primitives are
+  implemented; managed executor and provider conformance remain in progress.
 - Date: 2026-10-20.
 
 ## Context
 
 The first real execution adapters must use the authenticated CLIs already
-available to the team. The initial operator configuration has five independent
-profiles: Codex for employee 1, Codex for employee 2, Codex for employee 3,
-Antigravity, and Claude Code. This is a set of executor profiles, not a shared
-login, a provider API integration, or a claim that every CLI has identical
-features.
+available to the operator. The current local configuration has six selectable
+profiles: four Codex CLI profiles, Antigravity, and Claude Code. This is a set
+of invocation contexts, not people or unique provider accounts. Multiple Codex
+profiles may belong to the same person/account; each has its own local
+`CODEX_HOME` to isolate CLI state. This is not a provider API integration or a
+claim that every CLI has identical features.
 
 The local CLIs expose headless invocation modes, but they differ in command
 syntax, session IDs, event streams, auth storage, cancellation, and enforcement.
@@ -34,11 +36,11 @@ boundary.
    adapters. The contract covers capability discovery, task preparation,
    start/resume, normalized events, candidate delivery, cancellation request,
    and separately confirmed process termination.
-2. Represent the initial five choices as five named, independently selectable
+2. Represent the current six choices as named, independently selectable
    profiles. Each Codex profile has a distinct operator-managed `CODEX_HOME`.
    The selected Claude and Antigravity CLI contexts remain independently
    operator-managed. AWH does not copy, inspect, synchronize, or pool login
-   material.
+   material; profile IDs do not prove account identity.
 3. Store profile names, executable paths, safe invocation options, and auth
    context *references* in private local configuration. Never put tokens,
    auth files, account email addresses, or local home paths in repository files,
@@ -62,13 +64,14 @@ boundary.
 
 ## M3 sequence and acceptance
 
-1. Specify the common executor protocol and private profile format; make
-   capability reports include tested CLI version, invocation mode, resume
-   support, event format, cancellation semantics, identity reference, and
-   isolation level.
-2. Implement and test the Codex CLI adapter first, then configure the three
-   Codex homes as separate profiles. Validate profile selection without
-   printing or reading authentication material.
+1. Specify the common executor protocol and private profile format; capability
+   reports include the exact tested CLI version, invocation mode, resume
+   support, event format, cancellation semantics, and effective isolation.
+   Profiles are not proof of identity.
+2. Implement and test the Codex adapter first. Use the local stdio app-server
+   protocol for long-lived threads and streamed events; reserve `codex exec`
+   for bounded one-shot jobs. Configure four separate Codex homes. Validate
+   profile selection without printing or reading authentication material.
 3. Independently verify and add `agy` and Claude Code adapters. Do not infer
    conformance from a common `--print` flag.
 4. Add a task-scoped execution boundary and run the conformance suite against
@@ -79,7 +82,7 @@ boundary.
 5. Start with synthetic tests and a bounded, operator-approved smoke task in a
    disposable project. Do not invoke live model sessions during ordinary tests.
 
-The M3 milestone is not complete when all five binaries launch. Each provider
+The M3 milestone is not complete when all six binaries launch. Each provider
 profile must pass the relevant independent conformance tests, and unsupported
 features must remain explicit. This ADR does not implement LangGraph, shared
 memory/RAG, multi-host dispatch, or remote GitHub publication.

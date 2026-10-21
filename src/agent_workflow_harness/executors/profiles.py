@@ -14,9 +14,10 @@ from jsonschema import Draft202012Validator
 from ..validation import read_json
 
 _EXPECTED = {
-    "codex-employee-1": "codex",
-    "codex-employee-2": "codex",
-    "codex-employee-3": "codex",
+    "codex-cli-1": "codex",
+    "codex-cli-2": "codex",
+    "codex-cli-3": "codex",
+    "codex-cli-4": "codex",
     "antigravity": "antigravity",
     "claude-code": "claude",
 }
@@ -37,7 +38,7 @@ def validate_profiles(document) -> list[str]:
         return sorted(errors)
     profiles = {profile["profile_id"]: profile for profile in document["profiles"]}
     if set(profiles) != set(_EXPECTED):
-        return ["profiles must define the three Codex, Antigravity, and Claude Code profile IDs"]
+        return ["profiles must define four Codex CLI, Antigravity, and Claude Code profile IDs"]
     for profile_id, provider in _EXPECTED.items():
         profile = profiles[profile_id]
         if profile["provider"] != provider:
@@ -53,7 +54,7 @@ def validate_profiles(document) -> list[str]:
 
 
 def check_profiles(config_path: Path, *, environ=None, which=None, run=None):
-    """Check five local CLI binaries and Codex home directory separation.
+    """Check six local CLI binaries and four distinct Codex home directories.
 
     No auth file is opened, no CLI login/session command is run, and no model
     request is sent. A successful check does not verify login status.
@@ -87,7 +88,7 @@ def check_profiles(config_path: Path, *, environ=None, which=None, run=None):
                 else:
                     resolved = str(home.resolve())
                     if resolved in codex_homes:
-                        errors.append("Codex profiles must resolve to three distinct CODEX_HOME directories")
+                        errors.append("Codex profiles must resolve to four distinct CODEX_HOME directories")
                     codex_homes.add(resolved)
 
         executable = which(profile["executable"])

@@ -1,41 +1,62 @@
-# Headless CLI profiles (M3 in progress)
+# Local CLI profiles and executor status
 
-M3 uses five local CLI profiles: three separately authenticated Codex CLI
-profiles, one Antigravity CLI (`agy`), and one Claude Code CLI. The checked-in
-[example](../examples/executors/profiles.example.json) contains profile IDs and
-executable names only. Copy it to an operator-managed private file before
-adding machine-specific settings. Never commit CLI auth files, account metadata,
-or personal home-directory paths.
+The operator currently configures six local CLI profiles: four independent
+Codex CLI profiles, one Antigravity CLI (`agy`), and one Claude Code CLI. A
+profile identifies an invocation context, not a person or a unique provider
+account. Multiple Codex profiles may use the same person's account; each still
+has a separate `CODEX_HOME` so local CLI state does not collide.
 
-The three Codex processes must use distinct `CODEX_HOME` directories. Set the
-following environment variables to the already-authenticated directories before
-running the profile check:
+The checked-in [example](../examples/executors/profiles.example.json) contains
+profile IDs, executable names, and environment-variable *names*. Copy it to a
+private operator-managed file before adding machine-specific settings. Never
+commit CLI auth files, account metadata, or personal home-directory paths.
+Authentication remains managed by each CLI through its own local OAuth login.
+AWH neither reads nor copies login material and does not claim that profile IDs
+prove account identity.
+
+Set four distinct, existing, absolute `CODEX_HOME` paths before checking the
+profiles:
 
 ```sh
-export AWH_CODEX_HOME_EMPLOYEE_1="/private/path/to/codex-home-1"
-export AWH_CODEX_HOME_EMPLOYEE_2="/private/path/to/codex-home-2"
-export AWH_CODEX_HOME_EMPLOYEE_3="/private/path/to/codex-home-3"
+export AWH_CODEX_HOME_1="/private/path/to/codex-home-1"
+export AWH_CODEX_HOME_2="/private/path/to/codex-home-2"
+export AWH_CODEX_HOME_3="/private/path/to/codex-home-3"
+export AWH_CODEX_HOME_4="/private/path/to/codex-home-4"
 awh profiles check --config /private/path/to/cli-profiles.json
 ```
 
 The checker invokes each configured executable with `--version` only. It checks
-that the three Codex home paths exist and resolve to different directories. It
+that all four Codex home paths exist and resolve to different directories. It
 does **not** open auth files, verify login state, start an agent, or send a
-provider request. The JSON result deliberately omits local paths. A green result
-means only that the five local executables respond with recognizable versions
-and the three Codex home directories are configured distinctly.
+provider request. The JSON result deliberately omits local paths. A passing
+preflight confirms only that the six executables report recognizable versions
+and the four Codex home directories are configured distinctly.
 
-The current headless entry points differ: Codex provides `codex exec` (with JSONL
-events), Claude Code provides `claude --print` (with stream-json output), and
-Antigravity's installed CLI is `agy --print` (also with stream-json output).
-Their event formats, resume IDs, tool permissions, cancellation behavior, and
-auth selection are not interchangeable. AWH has not yet implemented these
-launchers or verified authenticated sessions.
+## Executor implementation status
 
-Do not use a CLI profile to edit the shared checkout. The M2a container does not
-have provider network access or credentials, and the current CLI profile check
-does not provide a runner. Before code-writing sessions, M3 must add a
-task-scoped CLI execution boundary with constrained provider egress and route
-candidate commands/builds/tests through M2a. All resulting changes still need
-trusted validation and M2b protected integration. See
+The provider-neutral lifecycle contract covers capability discovery,
+preparation, start/resume, normalized events, candidate delivery, cancellation
+request, and separately confirmed process termination. The Codex adapter
+prototype now serializes local stdio JSON-RPC requests and normalizes a limited
+event allowlist. It uses Codex app-server methods for long-lived threads, turns,
+resume, events, and interruption. `codex exec --json` remains suitable for
+bounded one-shot jobs, but does not by itself fulfill AWH's full lifecycle
+contract. The protocol helpers are not yet connected to a managed process, and
+do not launch a live session. The integration will preserve the
+operator-selected `CODEX_HOME` and will not substitute API keys for OAuth login.
+OpenAI describes app-server as the client protocol for threads, turns, streamed
+events, and approvals; its current CLI labels the command experimental. AWH
+therefore pins the exact CLI build and treats every protocol capability as
+unverified until that build passes conformance ([app-server reference](https://developers.openai.com/codex/app-server),
+[non-interactive CLI reference](https://developers.openai.com/codex/non-interactive-mode)).
+
+The adapter may start only through a task-scoped `AgentProcessBoundary` that
+provides independently enforced filesystem and process isolation, provider
+egress policy, and a constrained tool/effect gateway. No such network-capable
+boundary is implemented yet. The current M2a Docker runner has no provider
+network access or credentials and remains the trusted route for candidate
+builds/tests. Therefore no code-writing Codex session can be launched by AWH
+yet. Local profiles and CLI sandbox flags alone are not an AWH security
+boundary. The Codex app-server is version-sensitive; the deployed version must
+be pinned and pass conformance before its capabilities are advertised. See
 [ADR 0009](decisions/0009-headless-cli-executors.md).

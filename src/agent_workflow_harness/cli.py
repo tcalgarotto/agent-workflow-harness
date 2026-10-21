@@ -18,7 +18,7 @@ def main(argv=None):
     profiles = subcommands.add_parser("profiles", help="Inspect local headless CLI profiles")
     profile_commands = profiles.add_subparsers(dest="profile_command", required=True)
     profile_check = profile_commands.add_parser(
-        "check", help="Check CLI availability and distinct Codex homes without starting agents"
+        "check", help="Check six CLIs and distinct Codex homes without starting agents"
     )
     profile_check.add_argument("--config", type=Path, required=True)
     args = parser.parse_args(argv)
