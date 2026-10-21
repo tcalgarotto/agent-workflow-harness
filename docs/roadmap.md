@@ -35,8 +35,12 @@ open; this milestone group is not complete end-to-end.
       this does not authenticate or launch agents.
 - [x] Provider-neutral executor lifecycle contract and Codex app-server
       protocol primitives with mocked tests; no live process launch.
+- [x] Fail-closed Codex lifecycle manager contract: every launch requires a
+      boundary receipt bound to the complete task run and selected profile;
+      lifecycle semantics are exercised with a fake boundary only.
 - [ ] Managed Codex app-server process adapter behind a task-scoped execution
-      boundary, with versioned conformance and no credential inspection.
+      backend, with versioned conformance and no credential inspection. The
+      manager currently depends on an interface; no production boundary exists.
 - [ ] Six separately selectable CLI profiles: four isolated Codex homes, one
       Antigravity CLI, and one Claude Code CLI; profiles are not account/person
       identities and credentials are never pooled.

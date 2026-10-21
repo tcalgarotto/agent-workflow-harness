@@ -60,3 +60,12 @@ yet. Local profiles and CLI sandbox flags alone are not an AWH security
 boundary. The Codex app-server is version-sensitive; the deployed version must
 be pinned and pass conformance before its capabilities are advertised. See
 [ADR 0009](decisions/0009-headless-cli-executors.md).
+
+The managed Codex lifecycle manager now requires a task-scoped
+`AgentProcessBoundary` receipt bound to the complete run and selected profile.
+It rechecks AWH authority before start/resume, rejects mismatched receipts, and
+distinguishes an interrupt request from confirmed process termination. Its
+tests use a fake boundary; there is no production boundary implementation and
+no live session is launched. A conforming boundary must independently enforce
+filesystem/process isolation, provider egress controls, and a constrained
+tool/effect gateway.
