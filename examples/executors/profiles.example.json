@@ -1,0 +1,10 @@
+{
+  "schema_version": "1",
+  "profiles": [
+    {"profile_id": "codex-employee-1", "provider": "codex", "executable": "codex", "auth_home_env": "AWH_CODEX_HOME_EMPLOYEE_1"},
+    {"profile_id": "codex-employee-2", "provider": "codex", "executable": "codex", "auth_home_env": "AWH_CODEX_HOME_EMPLOYEE_2"},
+    {"profile_id": "codex-employee-3", "provider": "codex", "executable": "codex", "auth_home_env": "AWH_CODEX_HOME_EMPLOYEE_3"},
+    {"profile_id": "antigravity", "provider": "antigravity", "executable": "agy"},
+    {"profile_id": "claude-code", "provider": "claude", "executable": "claude"}
+  ]
+}

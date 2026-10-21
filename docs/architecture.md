@@ -1,10 +1,12 @@
 # Target architecture
 
 This describes the intended end-to-end runtime. The project implements static
-contract validation and the optional [M1 coordinator](m1-coordination.md).
-The optional [M2a supervisor](m2a-supervisor.md) implements bounded Linux/Docker
-command execution and authenticated content-bound validation receipts.
-AI runner integration, retrieval and protected Git integration remain planned.
+contract validation, the optional [M1 coordinator](m1-coordination.md), the
+optional [M2a supervisor](m2a-supervisor.md), and the optional [M2b protected
+local Git gateway](m2b-integration.md). M2a provides bounded Linux/Docker command
+execution and authenticated content-bound validation receipts. M2b checks live
+authority and receipts before protected local Git integration. AI runner
+integration, retrieval, and remote Git publication remain planned.
 
 Start with the [operational blueprint and interactive maps](blueprint/index.html)
 for the end-to-end plan, three-worker example, recovery paths and implementation
@@ -34,6 +36,17 @@ The [storage proposal](storage-and-retrieval.md) prioritizes PostgreSQL for the
 first persistent coordinator and treats lexical/vector retrieval as replaceable
 projections. Database transactions, checkpoint storage and search freshness have
 separate semantics. See [ADR 0005](decisions/0005-postgresql-first-storage-and-retrieval.md).
+
+M3 starts with headless CLI executors: three independently configured Codex CLI
+profiles, one Antigravity CLI profile, and one Claude Code profile. Each profile
+is a separate account-context/configuration boundary; a CLI process never receives
+another profile's authentication context. See
+[ADR 0009](decisions/0009-headless-cli-executors.md). M2a's existing Docker
+profile has no network or provider credentials, so it cannot directly host a
+provider CLI that needs both. A CLI must not be launched against a shared host
+checkout: a new network-capable, task-scoped execution boundary and tool/effect
+gateway must be designed and tested before enabling code-writing headless runs.
+Git worktrees alone do not provide that isolation.
 
 ## Authorities
 

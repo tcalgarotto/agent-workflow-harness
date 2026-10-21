@@ -26,10 +26,15 @@ authority, revalidates the exact combination with the current accepted base,
 protects checks and integrates through a private local Git repository with
 compare-and-swap and crash reconciliation.
 
-**Not implemented:** AI agent/provider execution,
+**Not implemented:** headless CLI execution (M3 design is recorded in
+[ADR 0009](docs/decisions/0009-headless-cli-executors.md)),
 a LangGraph runtime, RAG, MCP endpoints, provider adapters,
 or remote GitHub publication. Validating a declaration does not prove that a runner enforces
 it. This is not production security software and does not promise zero hallucinations.
+
+The initial five-profile setup and its non-authenticating preflight are described
+in [Headless CLI profiles](docs/cli-executors.md). No headless agent execution is
+implemented yet.
 
 M1 records trusted controller decisions; M2a supervises its own containers and
 binds validation results to content. M2b implements the bounded local Git effect

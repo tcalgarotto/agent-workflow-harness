@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent Workflow Harness: local headless CLI profiles",
+  "type": "object",
+  "properties": {
+    "schema_version": {"const": "1"},
+    "profiles": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "properties": {
+          "profile_id": {
+            "enum": ["codex-employee-1", "codex-employee-2", "codex-employee-3", "antigravity", "claude-code"]
+          },
+          "provider": {"enum": ["codex", "antigravity", "claude"]},
+          "executable": {"enum": ["codex", "agy", "claude"]},
+          "auth_home_env": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,63}$"}
+        },
+        "required": ["profile_id", "provider", "executable"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schema_version", "profiles"],
+  "additionalProperties": false
+}

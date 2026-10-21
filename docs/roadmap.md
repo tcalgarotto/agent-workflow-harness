@@ -31,7 +31,16 @@ open; this milestone group is not complete end-to-end.
 - [x] M2a Linux/Docker command executor and separate content-bound validation runner.
 - [x] M2a real containment, cancellation/recovery and authenticated receipt tests.
 - [x] M2b revision-bound evidence and protected local Git integration gateway.
-- [ ] One real adapter passing conformance tests.
+- [x] M3 five-profile declaration and safe CLI-version/Codex-home preflight;
+      this does not authenticate or launch agents.
+- [ ] One real headless CLI executor adapter passing conformance tests.
+- [ ] Five separately selectable CLI profiles: three isolated Codex homes, one
+      Antigravity CLI, and one Claude Code CLI; no shared or pooled credentials.
+- [ ] Network-capable agent execution isolated per task and routed through
+      AWH-controlled tools/effects; current no-network M2a candidate runner stays
+      separate for code/build/test execution.
+- [ ] CLI event normalization, resume binding, delivery, and requested-versus-
+      confirmed cancellation semantics.
 - [ ] Task-specific completeness checks and isolation of hidden build/test state.
 
 Exit: cross-workspace writes fail and changes after verification invalidate receipts.
