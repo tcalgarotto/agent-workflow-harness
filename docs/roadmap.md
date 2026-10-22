@@ -31,7 +31,28 @@ open; this milestone group is not complete end-to-end.
 - [x] M2a Linux/Docker command executor and separate content-bound validation runner.
 - [x] M2a real containment, cancellation/recovery and authenticated receipt tests.
 - [x] M2b revision-bound evidence and protected local Git integration gateway.
-- [ ] One real adapter passing conformance tests.
+- [x] M3 six-profile declaration and safe CLI-version/Codex-home preflight;
+      this does not authenticate or launch agents.
+- [x] Provider-neutral executor lifecycle contract and Codex app-server
+      protocol primitives with mocked tests; no live process launch.
+- [x] Fail-closed Codex lifecycle manager contract: every launch requires a
+      boundary receipt bound to the complete task run and selected profile;
+      lifecycle semantics are exercised with a fake boundary only.
+- [x] First task-boundary primitives: private Codex run home and permission
+      profile, task-only isolated Docker network, HTTPS egress allowlist proxy,
+      and runtime workspace binding; unit tests plus a manual local Docker
+      network check. These primitives are not a process runner.
+- [ ] Managed Codex app-server process adapter behind a task-scoped execution
+      backend, with versioned conformance and no credential inspection. No
+      production boundary exists yet.
+- [ ] Six separately selectable CLI profiles: four isolated Codex homes, one
+      Antigravity CLI, and one Claude Code CLI; profiles are not account/person
+      identities and credentials are never pooled.
+- [ ] Network-capable agent execution isolated per task and routed through
+      AWH-controlled tools/effects; current no-network M2a candidate runner stays
+      separate for code/build/test execution.
+- [ ] CLI event normalization, resume binding, delivery, and requested-versus-
+      confirmed cancellation semantics.
 - [ ] Task-specific completeness checks and isolation of hidden build/test state.
 
 Exit: cross-workspace writes fail and changes after verification invalidate receipts.

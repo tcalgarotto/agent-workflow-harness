@@ -26,10 +26,21 @@ authority, revalidates the exact combination with the current accepted base,
 protects checks and integrates through a private local Git repository with
 compare-and-swap and crash reconciliation.
 
-**Not implemented:** AI agent/provider execution,
+**Not implemented:** managed headless CLI execution (M3 design is recorded in
+[ADR 0009](docs/decisions/0009-headless-cli-executors.md)),
 a LangGraph runtime, RAG, MCP endpoints, provider adapters,
 or remote GitHub publication. Validating a declaration does not prove that a runner enforces
 it. This is not production security software and does not promise zero hallucinations.
+
+M3 now has initial Codex task-boundary primitives for private run homes,
+per-task network topology, and an allowlisted HTTPS proxy. They are documented
+in [the M3 boundary note](docs/m3-agent-boundary.md); a production CLI process
+runner and live headless execution are still not implemented.
+
+The initial six-profile setup and its non-authenticating preflight are described
+in [Headless CLI profiles](docs/cli-executors.md). The provider-neutral
+executor contract and Codex app-server protocol helpers are tested, but there is
+no managed process runner or live headless agent execution yet.
 
 M1 records trusted controller decisions; M2a supervises its own containers and
 binds validation results to content. M2b implements the bounded local Git effect
